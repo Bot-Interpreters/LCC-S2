@@ -52,4 +52,6 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
 LIGHTBLUE = (0, 155, 155)
-BGCOLOR = LIGHTBLUE
+OLIVEGREEN = (186, 184, 108)
+GREENYELLOW = (173, 255, 47)
+BGCOLOR = GREENYELLOW 	# sai changed bg colour from light blue to olive green

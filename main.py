@@ -212,6 +212,8 @@ class CoronaBreakout:
         """
 
         # load music
+        pygame.mixer.music.load(os.path.join(self.sound_dir, "st.ogg"))
+        pygame.mixer.music.play(loops=-1)
 
         self.screen.fill(s.BGCOLOR)
 
@@ -228,6 +230,7 @@ class CoronaBreakout:
         self.wait_for_key()
 
         # fadeout music
+        pygame.mixer.music.fadeout(500)
 
     def show_gameover_screen(self):
         """Game over screen.
