@@ -44,14 +44,13 @@ class SpriteSheet:
 
 class Platform(pygame.sprite.Sprite):
 
-    def __init__(self, game, x, y, base=False):
+    def __init__(self, game, x, y):
         """Initializing a platform sprite.
 
         Args:
             game (game_instance): Game instance.
             x (int): x coordinate of the center of the platform.
             y (int): y coordinate of the center of the platform.
-            base (bool): Whether the platform is used as base ro not.
         """
 
         self._layer = s.PLATFORM_LAYER
@@ -60,23 +59,42 @@ class Platform(pygame.sprite.Sprite):
 
         self.game = game
 
-        if base:  # load base image
-            self.image = self.game.base_img
+        # load a random image
+        images = [
+            self.game.plat_spritesheet.get_image(0, 96, 380, 94),  # stone
+            self.game.plat_spritesheet.get_image(0, 192, 380, 94),  # stone broken
+            self.game.plat_spritesheet.get_image(382, 408, 200, 100),  # stone small
+            self.game.plat_spritesheet.get_image(232, 1288, 200, 100),  # stone small broken
+        ]
 
-        else:  # load a random image
-            images = [
-                self.game.plat_spritesheet.get_image(0, 96, 380, 94),  # stone
-                self.game.plat_spritesheet.get_image(0, 192, 380, 94),  # stone broken
-                self.game.plat_spritesheet.get_image(382, 408, 200, 100),  # stone small
-                self.game.plat_spritesheet.get_image(232, 1288, 200, 100),  # stone small broken
-            ]
-
-            self.image = random.choice(images)
+        self.image = random.choice(images)
 
         self.image.set_colorkey(s.BLACK)
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+
+
+class Base(pygame.sprite.Sprite):
+
+    def __init__(self, game, x):
+        """Initializing a Base sprite.
+
+        Args:
+            game (game_instance): Game instance.
+            x (int): x coordinate of the Base sprite.
+        """
+
+        self._layer = s.PLATFORM_LAYER
+        groups = game.all_sprites
+        super(Base, self).__init__(groups)
+
+        self.game = game
+        self.image = self.game.base_img
+        self.image.set_colorkey(s.BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = s.HEIGHT - s.BASE_HEIGHT
 
 
 class Player(pygame.sprite.Sprite):
@@ -201,8 +219,11 @@ class Player(pygame.sprite.Sprite):
         """
 
         self.rect.x += 2  # see upto 2 pixels below
-        hits = pygame.sprite.spritecollide(self, self.game.platforms, False)  # don't kill
+        plat_hits = pygame.sprite.spritecollide(self, self.game.platforms, False)  # don't kill
+        base_hits = pygame.sprite.spritecollide(self, self.game.bases, False)
         self.rect.x -= 2
+
+        hits = plat_hits or base_hits
 
         if hits and not self.jumping:
             # add sound for jumping

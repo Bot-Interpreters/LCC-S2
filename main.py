@@ -2,7 +2,7 @@ import os
 import pygame
 import random
 import settings as s
-from sprites import SpriteSheet, Platform, Player
+from sprites import SpriteSheet, Platform, Player, Base
 
 
 class CoronaBreakout:
@@ -68,10 +68,10 @@ class CoronaBreakout:
 
         # creating base
         self.bases = []
-        base = Platform(self, 0, s.HEIGHT - s.BASE_HEIGHT, base=True)
+        base = Base(self, 0)
         self.bases.append(base)
         while base.rect.right < s.WIDTH:
-            base = Platform(self, base.rect.right, s.HEIGHT - s.BASE_HEIGHT, base=True)
+            base = Base(self, base.rect.right)
             self.bases.append(base)
 
         # creating starting platforms
@@ -134,43 +134,47 @@ class CoronaBreakout:
         # update all sprites
         self.all_sprites.update()
 
-        # base for the player.
-        if self.player.pos.y > s.HEIGHT - s.BASE_HEIGHT:
-            self.player.pos.y = s.HEIGHT - s.BASE_HEIGHT
-            self.player.vel.y = 0
-            self.player.jumping = False
-
         # create new bases are player moves
-        last_base = self.bases[-1]
-        if last_base.rect.right <= s.WIDTH:
-            new_base = Platform(self, last_base.rect.right, s.HEIGHT - s.BASE_HEIGHT, base=True)
-            self.bases.append(new_base)
-            self.bases.pop(0)
+        # last_base = self.bases[-1]
+        # if last_base.rect.right <= s.WIDTH:
+        #     new_base = Base(self, last_base.rect.right, s.HEIGHT - s.BASE_HEIGHT)
+        #     self.bases.append(new_base)
+        #     self.bases.pop(0)
+
+        # player - base collision check
+        base_hits = pygame.sprite.spritecollide(self.player, self.bases, False)
+        if base_hits:
+            lowest = base_hits[0]
+            # if player below base, make him rest on base
+            if self.player.pos.y > lowest.rect.top:
+                self.player.pos.y = lowest.rect.top
+                self.player.vel.y = 0
+                self.player.jumping = False
 
         # player - platform collision check
-        hits = pygame.sprite.spritecollide(self.player, self.platforms, False)  # don't kill
+        temp_plat_hits = pygame.sprite.spritecollide(self.player, self.platforms, False)  # BB check
+        if temp_plat_hits:  # mask check
+            plat_hits = pygame.sprite.spritecollide(self.player, self.platforms, False, pygame.sprite.collide_mask)
 
-        if hits:
-            lowest = hits[0]
+        try:
+            if plat_hits:
+                lowest = plat_hits[0]
 
-            # if player is within the platforms's width
-            if self.player.pos.x < lowest.rect.right and \
-                    self.player.pos.x > lowest.rect.left:
-                # if player is above platform, make him rest on platform
-                if self.player.pos.y < lowest.rect.centery:
-                    self.player.pos.y = lowest.rect.top
-                    self.player.vel.y = 0
-                    self.player.jumping = False
-                # if player is below the platform, and was going/jumping up, restrict his jump
-                if self.player.pos.y > lowest.rect.bottom and self.player.vel.y < 0:
-                    self.player.rect.top = lowest.rect.bottom
-                    self.player.vel.y = 0
-                    self.player.jumping = False
-
-            # if self.player.rect.top < lowest.rect.top:
-            #     if self.player.rect.right > lowest.rect.left:
-            #         self.player.rect.right = lowest.rect.left
-            #         self.player.vel.x = 0
+                # if player is within the platforms's width
+                if self.player.pos.x - self.player.rect.width / 2 < lowest.rect.right and \
+                        self.player.pos.x + self.player.rect.width / 2 > lowest.rect.left:
+                    # if player is above platform, make him rest on platform
+                    if self.player.pos.y < lowest.rect.centery:
+                        self.player.pos.y = lowest.rect.top
+                        self.player.vel.y = 0
+                        self.player.jumping = False
+                    # if player is below the platform, and was going/jumping up, restrict his jump
+                    if self.player.pos.y > lowest.rect.bottom and self.player.vel.y < 0:
+                        self.player.pos.y = lowest.rect.bottom + self.player.rect.height
+                        self.player.vel.y = 0
+                        self.player.jumping = False
+        except Exception:
+            pass
 
         '''
         # moving screen towards right
