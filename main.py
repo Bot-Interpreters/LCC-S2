@@ -4,6 +4,7 @@ import random
 import settings as s
 from sprites import SpriteSheet, Platform, Player
 
+pygame.mixer.init()  #needed for the background sound
 
 class CoronaBreakout:
 
@@ -161,6 +162,7 @@ class CoronaBreakout:
                     self.player.vel.y = 0
                     self.player.jumping = False
 
+
         '''
         # moving screen towards right
         if self.player.rect.right >= s.WIDTH * 1 / 2:
@@ -197,6 +199,9 @@ class CoronaBreakout:
         """
 
         # load music
+        pygame.mixer.music.load("st.ogg")
+        pygame.mixer.music.play()
+
 
         self.screen.fill(s.BGCOLOR)
 

@@ -79,6 +79,8 @@ class Platform(pygame.sprite.Sprite):
         self.rect.y = y
 
 
+
+
 class Player(pygame.sprite.Sprite):
 
     def __init__(self, game):
@@ -302,3 +304,6 @@ class Player(pygame.sprite.Sprite):
         # show hurt animation
 
         self.mask = pygame.mask.from_surface(self.image)
+    
+
+   
