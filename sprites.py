@@ -1,3 +1,4 @@
+import os
 import pygame
 import random
 import settings as s
@@ -43,13 +44,14 @@ class SpriteSheet:
 
 class Platform(pygame.sprite.Sprite):
 
-    def __init__(self, game, x, y):
+    def __init__(self, game, x, y, base=False):
         """Initializing a platform sprite.
 
         Args:
             game (game_instance): Game instance.
             x (int): x coordinate of the center of the platform.
             y (int): y coordinate of the center of the platform.
+            base (bool): Whether the platform is used as base ro not.
         """
 
         self._layer = s.PLATFORM_LAYER
@@ -57,3 +59,21 @@ class Platform(pygame.sprite.Sprite):
         super(Platform, self).__init__(groups)
 
         self.game = game
+
+        if base:  # load base image
+            self.image = self.game.base_img
+
+        else:  # load a random image
+            images = [
+                self.game.plat_spritesheet.get_image(0, 96, 380, 94),  # stone
+                self.game.plat_spritesheet.get_image(0, 192, 380, 94),  # stone broken
+                self.game.plat_spritesheet.get_image(382, 408, 200, 100),  # stone small
+                self.game.plat_spritesheet.get_image(232, 1288, 200, 100),  # stone small broken
+            ]
+
+            self.image = random.choice(images)
+
+        self.image.set_colorkey(s.BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y

@@ -2,7 +2,7 @@ import os
 import pygame
 import random
 import settings as s
-# from sprites import *
+from sprites import SpriteSheet, Platform
 
 
 class CoronaBreakout:
@@ -13,7 +13,6 @@ class CoronaBreakout:
 
         pygame.init()
         pygame.mixer.init()
-        self.load_data()
 
         self.screen = pygame.display.set_mode((s.WIDTH, s.HEIGHT))
         pygame.display.set_caption(s.TITLE)
@@ -21,6 +20,7 @@ class CoronaBreakout:
         self.clock = pygame.time.Clock()
         self.font_name = pygame.font.match_font(s.FONT_NAME)
         self.running = True
+        self.load_data()
 
     def load_data(self):
         """Loads all necessary data.
@@ -32,19 +32,22 @@ class CoronaBreakout:
         self.img_dir = os.path.join(self.dir, 'images')
         self.sound_dir = os.path.join(self.dir, 'sounds')
 
-        # load high score, maybe try using json for each level.
-        try:
-            # if file exists, load data
+        # load high score
+        try:  # if file exists, load data
             with open(os.path.join(self.dir, s.HS_FILE), 'r') as f:
                 self.highscore = int(f.read())
-            # else create new file and initialize highscore to 0
-        except Exception:
+        except Exception:   # else create new file and set highscore to 0
             with open(os.path.join(self.dir, s.HS_FILE), 'w') as f:
                 self.highscore = 0
 
         # load spritesheets
+        self.enemy_spritesheet = SpriteSheet(os.path.join(self.img_dir, s.ENEMY_SPRITESHEET))
+        self.hud_spritesheet = SpriteSheet(os.path.join(self.img_dir, s.HUD_SPRITESHEET))
+        self.expl_spritesheet = SpriteSheet(os.path.join(self.img_dir, s.EXPL_SPRITESHEET))
+        self.plat_spritesheet = SpriteSheet(os.path.join(self.img_dir, s.PLAT_SPRITESHEET))
 
-        # load images
+        # load base image
+        self.base_img = pygame.image.load(os.path.join(self.img_dir, 'grassCenter.png'))
 
         # load sounds
 
@@ -62,7 +65,14 @@ class CoronaBreakout:
 
         # create new instance of player
 
-        # create new platforms
+        # create base
+        base = Platform(self, 0, s.HEIGHT - 70, base=True)
+        while base.rect.x + base.rect.width < s.WIDTH:
+            base = Platform(self, base.rect.x + base.rect.width, s.HEIGHT - 70, base=True)
+
+        # creating starting platforms
+        for plat in s.PLATFORM_LIST:
+            Platform(self, *plat)
 
         # create clouds/other images
 
@@ -99,8 +109,6 @@ class CoronaBreakout:
                     self.playing = False  # back to start screen
                 self.running = False  # closes the whole game
 
-            # mouse click on start screen
-
             # escape key to pause
 
             # keydown space to jump
@@ -114,7 +122,13 @@ class CoronaBreakout:
         """
 
         # update all sprites
-        pass
+        self.all_sprites.update()
+
+        # spawn new platforms
+        while len(self.platforms) < 3:
+            width = random.randrange(50, 100)
+            Platform(self, random.randrange(0, s.WIDTH - width),
+                     random.randrange(-75, -30))
 
     def draw(self):
         """Draw updated objects to the screen.
@@ -123,6 +137,7 @@ class CoronaBreakout:
         self.screen.fill(s.BGCOLOR)
 
         # draw all sprites
+        self.all_sprites.draw(self.screen)
 
         # draw texts
 
@@ -142,13 +157,13 @@ class CoronaBreakout:
                        s.WIDTH / 2, s.HEIGHT * 1 / 5)
         self.draw_text('Arrows to move and jump, space to shoot.', 22, s.WHITE,
                        s.WIDTH / 2, s.HEIGHT * 0.5)
-        self.draw_text('Press SPACE key to play', 22, s.WHITE,
+        self.draw_text('Press any key to play', 22, s.WHITE,
                        s.WIDTH / 2, s.HEIGHT * 0.6)
         self.draw_text(f'High Score: {self.highscore}', 22, s.WHITE,
                        s.WIDTH / 2, s.HEIGHT * 0.7)
 
         pygame.display.update()
-        self.wait_for_key(pygame.K_SPACE)
+        self.wait_for_key()
 
         # fadeout music
 
@@ -177,15 +192,9 @@ class CoronaBreakout:
                 f.write(str(self.score))
 
         pygame.display.update()
-        self.wait_for_key(pygame.K_SPACE)
+        self.wait_for_key()
 
         # fadeout music
-
-    def show_levels_screen(self):
-        """Levels screen.
-        """
-
-        pass
 
     def show_pause_screen(self):
         """Pause screen.
@@ -193,11 +202,8 @@ class CoronaBreakout:
 
         pass
 
-    def wait_for_key(self, key):
-        """Wait for a specified key press.
-
-        Args:
-            key (pygame.keys): the key to be pressed to end waiting.
+    def wait_for_key(self):
+        """Wait for a key press.
         """
 
         waiting = True
@@ -209,8 +215,7 @@ class CoronaBreakout:
                     waiting = False
                     self.running = False
                 if event.type == pygame.KEYUP:
-                    if event.key == key:
-                        waiting = False
+                    waiting = False
 
     def draw_text(self, text, size, color, x, y):
         """Draws text to screen.
