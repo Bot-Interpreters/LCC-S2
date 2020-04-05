@@ -55,6 +55,10 @@ class CoronaBreakout:
         self.score = 0
 
         # initialize sprite groups
+        self.all_sprites = pygame.sprite.LayeredUpdates()
+        self.platforms = pygame.sprite.Group()
+        self.powerups = pygame.sprite.Group()
+        self.enemies = pygame.sprite.Group()
 
         # create new instance of player
 
@@ -134,9 +138,17 @@ class CoronaBreakout:
 
         self.screen.fill(s.BGCOLOR)
 
-        # draw texts/buttons
+        self.draw_text(s.TITLE, 48, s.WHITE,
+                       s.WIDTH / 2, s.HEIGHT * 1 / 5)
+        self.draw_text('Arrows to move and jump, space to shoot.', 22, s.WHITE,
+                       s.WIDTH / 2, s.HEIGHT * 0.5)
+        self.draw_text('Press SPACE key to play', 22, s.WHITE,
+                       s.WIDTH / 2, s.HEIGHT * 0.6)
+        self.draw_text(f'High Score: {self.highscore}', 22, s.WHITE,
+                       s.WIDTH / 2, s.HEIGHT * 0.7)
 
         pygame.display.update()
+        self.wait_for_key(pygame.K_SPACE)
 
         # fadeout music
 
@@ -165,7 +177,7 @@ class CoronaBreakout:
                 f.write(str(self.score))
 
         pygame.display.update()
-        self.wait_for_key()
+        self.wait_for_key(pygame.K_SPACE)
 
         # fadeout music
 
@@ -181,9 +193,13 @@ class CoronaBreakout:
 
         pass
 
-    def wait_for_key(self):
-        """Wait for key press.
+    def wait_for_key(self, key):
+        """Wait for a specified key press.
+
+        Args:
+            key (pygame.keys): the key to be pressed to end waiting.
         """
+
         waiting = True
         while waiting:
             self.clock.tick(s.FPS)
@@ -193,7 +209,8 @@ class CoronaBreakout:
                     waiting = False
                     self.running = False
                 if event.type == pygame.KEYUP:
-                    waiting = False
+                    if event.key == key:
+                        waiting = False
 
     def draw_text(self, text, size, color, x, y):
         """Draws text to screen.
