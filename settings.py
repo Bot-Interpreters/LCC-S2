@@ -9,11 +9,17 @@ FPS = 60
 FONT_NAME = 'arial'
 HS_FILE = 'highscore.txt'
 
+# game properties
+BASE_HEIGHT = 35
+
 # player properties
 PLAYER_ACC = 0.5
-PLAYER_FRICTION = -0.12
+PLAYER_FRICTION = 0.12
 PLAYER_GRAV = 0.8
-PLAYER_JUMP = 20
+PLAYER_JUMP_VEL = 20
+JUMP_THRESHOLD = 3
+PLAYER_RUN_FREQ = 70
+PLAYER_IDLE_FREQ = 100
 
 # starting platforms
 PLATFORM_LIST = [
@@ -23,12 +29,20 @@ PLATFORM_LIST = [
 
 # sprite layers
 PLATFORM_LAYER = 1
+PLAYER_LAYER = 1
 
 # spritesheets
 ENEMY_SPRITESHEET = os.path.join('enemy', 'enemies_spritesheet.png')
 HUD_SPRITESHEET = os.path.join('hud', 'hud_spritesheet.png')
 EXPL_SPRITESHEET = os.path.join('explosions', 'explosions_spritesheet.png')
 PLAT_SPRITESHEET = os.path.join('platforms', 'platforms_spritesheet.png')
+
+# player images
+PLAYER_HURT = os.path.join('player', 'Hurt')
+PLAYER_IDLE = os.path.join('player', 'Idle')
+PLAYER_JUMP = os.path.join('player', 'Jump')
+PLAYER_RUN = os.path.join('player', 'Run')
+PLAYER_SHOT = os.path.join('player', 'Shot')
 
 # colors
 WHITE = (255, 255, 255)

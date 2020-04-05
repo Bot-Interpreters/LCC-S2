@@ -77,3 +77,228 @@ class Platform(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+
+
+class Player(pygame.sprite.Sprite):
+
+    def __init__(self, game):
+        """Initializing player.
+
+        Args:
+            game (game_instance): Game instance.
+        """
+
+        self._layer = s.PLAYER_LAYER
+        groups = game.all_sprites
+        super(Player, self).__init__(groups)
+
+        self.game = game
+        # self.idle = True
+        self.running = False
+        self.jumping = False
+        self.isRight = True
+        # self.shooting = False
+        # self.hurt = False
+
+        # tracking for animation
+        self.current_frame = 0
+        self.last_update = 0
+
+        # load image data
+        self.load_images()
+
+        self.image = self.standing_frames_r[0]
+        self.rect = self.image.get_rect()
+        self.rect.center = (20, s.HEIGHT - 50)  # initial pos of player
+
+        self.pos = vec(40, s.HEIGHT - 50)  # position vector
+        self.vel = vec(0, 0)  # velocity vector
+        self.acc = vec(0, 0)  # acceleration vector
+
+    def load_images(self):
+        """Loads all necessary images for animation.
+        """
+
+        # standing / idle frames
+        self.standing_frames_r = []
+        stand_dir = os.path.join(self.game.img_dir, s.PLAYER_IDLE)
+        for image in os.listdir(stand_dir):
+            frame = pygame.image.load(os.path.join(stand_dir, image)).convert()
+            rect = frame.get_rect()
+            frame = pygame.transform.scale(frame, (int(rect.width * 0.2),
+                                                   int(rect.height * 0.2)))
+            frame.set_colorkey(s.BLACK)
+            self.standing_frames_r.append(frame)
+
+        self.standing_frames_l = []
+        for frame in self.standing_frames_r:  # flip x, and not y
+            self.standing_frames_l.append(pygame.transform.flip(frame, True, False))
+
+        # hurt frames
+        self.hurt_frames_r = []
+        hurt_dir = os.path.join(self.game.img_dir, s.PLAYER_HURT)
+        for image in os.listdir(hurt_dir):
+            frame = pygame.image.load(os.path.join(hurt_dir, image)).convert()
+            rect = frame.get_rect()
+            frame = pygame.transform.scale(frame, (int(rect.width * 0.2),
+                                                   int(rect.height * 0.2)))
+            frame.set_colorkey(s.BLACK)
+            self.hurt_frames_r.append(frame)
+
+        self.hurt_frames_l = []
+        for frame in self.hurt_frames_r:  # flip x, and not y
+            self.hurt_frames_l.append(pygame.transform.flip(frame, True, False))
+
+        # jumping frames
+        self.jumping_frames_r = []
+        jump_dir = os.path.join(self.game.img_dir, s.PLAYER_JUMP)
+        for image in os.listdir(jump_dir):
+            frame = pygame.image.load(os.path.join(jump_dir, image)).convert()
+            rect = frame.get_rect()
+            frame = pygame.transform.scale(frame, (int(rect.width * 0.2),
+                                                   int(rect.height * 0.2)))
+            frame.set_colorkey(s.BLACK)
+            self.jumping_frames_r.append(frame)
+
+        self.jumping_frames_l = []
+        for frame in self.jumping_frames_r:  # flip x, and not y
+            self.jumping_frames_l.append(pygame.transform.flip(frame, True, False))
+
+        # run frames
+        self.run_frames_r = []
+        run_dir = os.path.join(self.game.img_dir, s.PLAYER_RUN)
+        for image in os.listdir(run_dir):
+            frame = pygame.image.load(os.path.join(run_dir, image)).convert()
+            rect = frame.get_rect()
+            frame = pygame.transform.scale(frame, (int(rect.width * 0.2),
+                                                   int(rect.height * 0.2)))
+            frame.set_colorkey(s.BLACK)
+            self.run_frames_r.append(frame)
+
+        self.run_frames_l = []
+        for frame in self.run_frames_r:  # flip x, and not y
+            self.run_frames_l.append(pygame.transform.flip(frame, True, False))
+
+        # shooting frames
+        self.shooting_frames_r = []
+        shot_dir = os.path.join(self.game.img_dir, s.PLAYER_SHOT)
+        for image in os.listdir(shot_dir):
+            frame = pygame.image.load(os.path.join(shot_dir, image)).convert()
+            rect = frame.get_rect()
+            frame = pygame.transform.scale(frame, (int(rect.width * 0.2),
+                                                   int(rect.height * 0.2)))
+            frame.set_colorkey(s.BLACK)
+            self.shooting_frames_r.append(frame)
+
+        self.shooting_frames_l = []
+        for frame in self.shooting_frames_r:  # flip x, and not y
+            self.shooting_frames_l.append(pygame.transform.flip(frame, True, False))
+
+    def jump(self):
+        """Jumps the player.
+
+        Jumps only if player is on platform, to avoid double jumping.
+        """
+
+        self.rect.x += 2  # see upto 2 pixels below
+        hits = pygame.sprite.spritecollide(self, self.game.platforms, False)  # don't kill
+        self.rect.x -= 2
+
+        if hits and not self.jumping:
+            # add sound for jumping
+            self.jumping = True
+            self.vel.y = s.PLAYER_JUMP_VEL * -1
+
+    def jump_cut(self):
+        """Stop the jump if key is released.
+
+        This allows the Player sprite to jump higher iff key is kept
+        pressed down.
+        """
+
+        if self.jumping:
+            if self.vel.y < s.JUMP_THRESHOLD * -1:
+                self.vel.y = s.JUMP_THRESHOLD * -1
+
+    def update(self):
+        """Update attributes of the player.
+
+        Movements, animation, friction and gravity.
+        """
+
+        self.animate()
+
+        # apply gravity to player
+        self.acc = vec(0, s.PLAYER_GRAV)
+
+        keys = pygame.key.get_pressed()
+
+        # add acceleration if key is pressed
+        if keys[pygame.K_LEFT]:
+            self.acc.x = s.PLAYER_ACC * -1
+        elif keys[pygame.K_RIGHT]:
+            self.acc.x = s.PLAYER_ACC
+
+        # apply friction
+        self.acc.x += self.vel.x * s.PLAYER_FRICTION * -1
+
+        # v = u + at | t = 1
+        self.vel += self.acc
+        # if vel is very low, stop movement.
+        if abs(self.vel.x) < 0.1:
+            self.vel.x = 0
+
+        # x = ut + 0.5 * at**2 | t = 1
+        self.pos += self.vel + 0.5 * self.acc
+
+        # update the position of the sprite with calculated pos
+        self.rect.midbottom = self.pos
+
+    def animate(self):
+        """Handles player animation.
+        """
+
+        now = pygame.time.get_ticks()
+
+        if self.vel.x != 0:
+            self.running = True
+        else:
+            self.running = False
+
+        # show running animation
+        if self.running:
+            if now - self.last_update > s.PLAYER_RUN_FREQ:
+                self.last_update = now
+                # get index of the next frame
+                self.current_frame = (self.current_frame + 1) % len(self.run_frames_l)
+                bottom = self.rect.bottom
+
+                if self.vel.x > 0:
+                    self.image = self.run_frames_r[self.current_frame]
+                else:
+                    self.image = self.run_frames_l[self.current_frame]
+
+                self.rect = self.image.get_rect()
+                self.rect.bottom = bottom
+
+        # show idle animation
+        if not self.jumping and not self.running:
+            if now - self.last_update > s.PLAYER_IDLE_FREQ:
+                self.last_update = now
+                # get index of the next frame
+                self.current_frame = (self.current_frame + 1) % len(self.standing_frames_r)
+                bottom = self.rect.bottom
+
+                if self.pos.x > 0:
+                    self.image = self.standing_frames_r[self.current_frame]
+                else:
+                    self.image = self.standing_frames_l[self.current_frame]
+
+                self.rect = self.image.get_rect()
+                self.rect.bottom = bottom
+
+        # show shooting animation
+
+        # show hurt animation
+
+        self.mask = pygame.mask.from_surface(self.image)

@@ -2,7 +2,7 @@ import os
 import pygame
 import random
 import settings as s
-from sprites import SpriteSheet, Platform
+from sprites import SpriteSheet, Platform, Player
 
 
 class CoronaBreakout:
@@ -64,11 +64,15 @@ class CoronaBreakout:
         self.enemies = pygame.sprite.Group()
 
         # create new instance of player
+        self.player = Player(self)
 
-        # create base
-        base = Platform(self, 0, s.HEIGHT - 70, base=True)
-        while base.rect.x + base.rect.width < s.WIDTH:
-            base = Platform(self, base.rect.x + base.rect.width, s.HEIGHT - 70, base=True)
+        # creating base
+        self.bases = []
+        base = Platform(self, 0, s.HEIGHT - s.BASE_HEIGHT, base=True)
+        self.bases.append(base)
+        while base.rect.right < s.WIDTH:
+            base = Platform(self, base.rect.right, s.HEIGHT - s.BASE_HEIGHT, base=True)
+            self.bases.append(base)
 
         # creating starting platforms
         for plat in s.PLATFORM_LIST:
@@ -112,8 +116,14 @@ class CoronaBreakout:
             # escape key to pause
 
             # keydown space to jump
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    self.player.jump()
 
             # keyup space to jump_cut
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_SPACE:
+                    self.player.jump_cut()
 
     def update(self):
         """Updates attributes of objects.
@@ -124,11 +134,48 @@ class CoronaBreakout:
         # update all sprites
         self.all_sprites.update()
 
+        # base for the player.
+        if self.player.pos.y > s.HEIGHT - s.BASE_HEIGHT:
+            self.player.pos.y = s.HEIGHT - s.BASE_HEIGHT
+            self.player.vel.y = 0
+
+        # create new bases are player moves
+        last_base = self.bases[-1]
+        if last_base.rect.right <= s.WIDTH:
+            new_base = Platform(self, last_base.rect.right, s.HEIGHT - s.BASE_HEIGHT, base=True)
+            self.bases.append(new_base)
+            self.bases.pop(0)
+
+        # player - platform collision check
+        hits = pygame.sprite.spritecollide(self.player, self.platforms, False)  # don't kill
+
+        if hits:
+            lowest = hits[0]
+
+            # checking x coordinates
+            if self.player.pos.x < lowest.rect.right and \
+                    self.player.pos.x > lowest.rect.left:
+                # checking y coordinates
+                if self.player.pos.y < lowest.rect.centery:
+                    self.player.pos.y = lowest.rect.top
+                    self.player.vel.y = 0
+                    self.player.jumping = False
+
+        '''
+        # moving screen towards right
+        if self.player.rect.right >= s.WIDTH * 1 / 2:
+            if not self.player.jumping:
+                self.player.pos.x -= max(abs(self.player.vel.x), 2)
+            for plat in self.platforms:
+                plat.rect.x -= max(abs(self.player.vel.y), 2)
+                if plat.rect.right <= 0:
+                    plat.kill()
+
         # spawn new platforms
-        while len(self.platforms) < 3:
-            width = random.randrange(50, 100)
-            Platform(self, random.randrange(0, s.WIDTH - width),
-                     random.randrange(-75, -30))
+        while len(self.platforms) < 12:
+            Platform(self, random.randrange(s.WIDTH - 50, s.WIDTH - 100),
+                     random.randrange(s.HEIGHT - 100, s.HEIGHT - 200))
+        '''
 
     def draw(self):
         """Draw updated objects to the screen.
@@ -180,6 +227,12 @@ class CoronaBreakout:
 
         self.screen.fill(s.BGCOLOR)
 
+        self.draw_text("GAME OVER", 48, s.WHITE, s.WIDTH / 2, s.HEIGHT / 4)
+        self.draw_text(f'Score: {self.score}', 22, s.WHITE,
+                       s.WIDTH / 2, s.HEIGHT / 2)
+        self.draw_text('Press a key to play again', 22, s.WHITE,
+                       s.WIDTH / 2, s.HEIGHT * 3 / 4)
+
         # draw texts/buttons
 
         if self.score > self.highscore:
@@ -229,7 +282,7 @@ class CoronaBreakout:
         """
 
         font = pygame.font.Font(self.font_name, size)
-        text_surface = font.render(text, True, color)
+        text_surface = font.render(text, True, color)  # antialiasing
         text_rect = text_surface.get_rect()
         text_rect.midtop = (x, y)
         self.screen.blit(text_surface, text_rect)
