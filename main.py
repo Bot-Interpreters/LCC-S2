@@ -165,7 +165,7 @@ class CoronaBreakout:
                         self.player.pos.x + self.player.rect.width / 2 > lowest.rect.left:
                     # if player is above platform, make him rest on platform
                     if self.player.pos.y < lowest.rect.centery:
-                        self.player.pos.y = lowest.rect.top
+                        self.player.pos.y = lowest.rect.top + 5  # to compensate for extra space below in image
                         self.player.vel.y = 0
                         self.player.jumping = False
                     # if player is below the platform, and was going/jumping up, restrict his jump
