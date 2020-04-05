@@ -138,6 +138,7 @@ class CoronaBreakout:
         if self.player.pos.y > s.HEIGHT - s.BASE_HEIGHT:
             self.player.pos.y = s.HEIGHT - s.BASE_HEIGHT
             self.player.vel.y = 0
+            self.player.jumping = False
 
         # create new bases are player moves
         last_base = self.bases[-1]
@@ -152,14 +153,24 @@ class CoronaBreakout:
         if hits:
             lowest = hits[0]
 
-            # checking x coordinates
+            # if player is within the platforms's width
             if self.player.pos.x < lowest.rect.right and \
                     self.player.pos.x > lowest.rect.left:
-                # checking y coordinates
+                # if player is above platform, make him rest on platform
                 if self.player.pos.y < lowest.rect.centery:
                     self.player.pos.y = lowest.rect.top
                     self.player.vel.y = 0
                     self.player.jumping = False
+                # if player is below the platform, and was going/jumping up, restrict his jump
+                if self.player.pos.y > lowest.rect.bottom and self.player.vel.y < 0:
+                    self.player.rect.top = lowest.rect.bottom
+                    self.player.vel.y = 0
+                    self.player.jumping = False
+
+            # if self.player.rect.top < lowest.rect.top:
+            #     if self.player.rect.right > lowest.rect.left:
+            #         self.player.rect.right = lowest.rect.left
+            #         self.player.vel.x = 0
 
         '''
         # moving screen towards right
