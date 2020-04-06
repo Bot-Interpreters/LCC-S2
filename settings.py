@@ -10,6 +10,7 @@ HS_FILE = 'highscore.txt'
 
 # game properties
 BASE_HEIGHT = 35
+POWERUP_SPAWN_FREQ = 50
 
 # player properties
 PLAYER_ACC = 0.6

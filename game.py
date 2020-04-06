@@ -163,7 +163,7 @@ class CoronaBreakout:
         if enemy_hits:
             self.playing = False
 
-        # create new bases are player moves
+        # create new bases as player moves
         last_base = self.bases[-1]
         if last_base.rect.right <= s.WIDTH:
             new_base = Base(self, last_base.rect.right, s.HEIGHT - s.BASE_HEIGHT)
@@ -241,6 +241,14 @@ class CoronaBreakout:
             rand_x = max_right + random.randrange(200, 400)
             rand_y = s.HEIGHT - 150 - s.BASE_HEIGHT - random.randrange(0, 100, 20)
             Platform(self, rand_x, rand_y)
+
+        # player - powerup collision check
+        pow_hits = pygame.sprite.spritecollide(self.player, self.powerups, True)
+        for powerUp in pow_hits:
+            # play sound
+
+            # add points to score
+            self.score += 10
 
     def draw(self):
         """Draw updated objects to the screen.

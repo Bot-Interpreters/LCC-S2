@@ -106,6 +106,10 @@ class Platform(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
+        # spawn a powerup on the platform
+        if random.randrange(100) < s.POWERUP_SPAWN_FREQ:
+            PowerUp(self.game, self)
+
 
 class Base(pygame.sprite.Sprite):
 
@@ -364,6 +368,12 @@ class Player(pygame.sprite.Sprite):
 class Slime(pygame.sprite.Sprite):
 
     def __init__(self, game):
+        """Initialize an enemy sprite.
+
+        Args:
+            game (game_instance): Game instance.
+        """
+
         self.layer = s.ENEMY_LAYER
         groups = game.all_sprites, game.enemies
         super(Slime, self).__init__(groups)
@@ -418,3 +428,53 @@ class Slime(pygame.sprite.Sprite):
             self.image = self.walk_images[self.current_frame]
 
         self.mask = pygame.mask.from_surface(self.image)
+
+
+class PowerUp(pygame.sprite.Sprite):
+    """A base class for all the powerups.
+    """
+
+    def __init__(self, game, plat):
+        """Initialize a powerup.
+
+        We need a platform sprite to spawn the powerup on.
+
+        Args:
+            game (game_instance): Game instance.
+            plat (Platform): Platform on which the powerup will spawn.
+        """
+
+        self._layer = s.POW_LAYER
+        groups = game.all_sprites, game.powerups
+        super(PowerUp, self).__init__(groups)
+
+        self.game = game
+        self.plat = plat
+        self.load_image()
+        self.rect = self.image.get_rect()
+        self.rect.centerx = self.plat.rect.centerx
+        self.rect.bottom = self.plat.rect.top - 5
+
+    def load_image(self):
+        """Loads the image.
+
+        Loads, scaled, rotates.
+        """
+
+        self.image = pygame.image.load(os.path.join(self.game.img_dir, 'syringe.png')).convert()
+        rect = self.image.get_rect()
+        self.image = pygame.transform.scale(self.image, (int(rect.width * 2), int(rect.height * 2)))
+        self.image = pygame.transform.rotate(self.image, 90)
+        self.image.set_colorkey(s.BLACK)
+
+    def update(self):
+        """Update sprite.
+
+        Move, Kill it if not on platform.
+        """
+
+        # moving powerup along with platform
+        self.rect.centerx = self.plat.rect.centerx
+
+        if not self.game.platforms.has(self.plat):
+            self.kill()
