@@ -1,5 +1,4 @@
 import os
-import random
 
 # game options/settings
 TITLE = 'Corona Breakout'
@@ -30,8 +29,10 @@ PLATFORM_START_LIST = [
 
 # sprite layers
 PLATFORM_LAYER = 1
-PLAYER_LAYER = 1
+POW_LAYER = 1
+PLAYER_LAYER = 2
 CLOUD_LAYER = 0
+ENEMY_LAYER = 2
 
 # spritesheets
 ENEMY_SPRITESHEET = os.path.join('enemy', 'enemies_spritesheet.png')

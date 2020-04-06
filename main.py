@@ -2,7 +2,7 @@ import os
 import pygame
 import random
 import settings as s
-from sprites import SpriteSheet, Platform, Player, Base, Cloud
+from sprites import SpriteSheet, Platform, Player, Base, Cloud, Slime
 
 
 class CoronaBreakout:
@@ -72,6 +72,7 @@ class CoronaBreakout:
 
         # create new instance of player
         self.player = Player(self)
+        self.enemy_timer = 0
 
         # creating base
         self.bases = []
@@ -145,6 +146,18 @@ class CoronaBreakout:
         # update all sprites
         self.all_sprites.update()
 
+        now = pygame.time.get_ticks()
+
+        # spawn enemy?
+        if now - self.enemy_timer > 5000 + random.choice([-1000, -500, 0, 500, 1000]):
+            self.enemy_timer = now
+            Slime(self)
+
+        # enemy hit?
+        enemy_hits = pygame.sprite.spritecollide(self.player, self.enemies, True, pygame.sprite.collide_mask)
+        if enemy_hits:
+            self.playing = False
+
         # create new bases are player moves
         last_base = self.bases[-1]
         if last_base.rect.right <= s.WIDTH:
@@ -192,16 +205,23 @@ class CoronaBreakout:
 
         # moving screen towards right
         if self.player.rect.right >= s.WIDTH * 0.45:
+            # creating new clouds
             if random.randrange(100) < s.CLOUD_FREQ:
                 Cloud(self)
             if self.player.vel.x > 0:
+                # updating player
                 self.player.pos.x -= max(self.player.vel.x, 3)
+                # updating previous clouds
                 for cloud in self.clouds:
                     cloud.rect.x -= max(self.player.vel.x / 2, 3)
+                # updating platforms
                 for plat in self.platforms:
                     plat.rect.x -= max(self.player.vel.x, 3)
                     if plat.rect.right <= 0:
                         plat.kill()
+                # updating enemies
+                for enemy in self.enemies:
+                    enemy.rect.x -= max(self.player.vel.x, 3)
 
         # spawn new platforms
         # calculate the right pos of previous platform

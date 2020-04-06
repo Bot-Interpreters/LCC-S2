@@ -45,6 +45,12 @@ class SpriteSheet:
 class Cloud(pygame.sprite.Sprite):
 
     def __init__(self, game):
+        """Initializing a Cloud sprite.
+
+        Args:
+            game (game_instance): Game instance.
+        """
+
         self._layer = s.CLOUD_LAYER
         groups = game.all_sprites, game.clouds
         super(Cloud, self).__init__(groups)
@@ -60,7 +66,11 @@ class Cloud(pygame.sprite.Sprite):
         self.rect.y = random.randrange(s.HEIGHT - 500, s.HEIGHT - 100)
 
     def update(self):
-        if self.rect.top > s.HEIGHT * 2:
+        """Updates sprite.
+
+        Kills the sprite if out of screen.
+        """
+        if self.rect.right < 0:
             self.kill()
 
 
@@ -347,5 +357,64 @@ class Player(pygame.sprite.Sprite):
         # show shooting animation
 
         # show hurt animation
+
+        self.mask = pygame.mask.from_surface(self.image)
+
+
+class Slime(pygame.sprite.Sprite):
+
+    def __init__(self, game):
+        self.layer = s.ENEMY_LAYER
+        groups = game.all_sprites, game.enemies
+        super(Slime, self).__init__(groups)
+
+        self.game = game
+        self.current_frame = 0
+        self.last_update = 0
+        self.load_images()
+        self.image = self.walk_images[0]
+        self.rect = self.image.get_rect()
+        self.rect.left = s.WIDTH
+        self.rect.bottom = s.HEIGHT - s.BASE_HEIGHT + 5
+        self.vx = random.randrange(1, 4)  # speed
+
+    def load_images(self):
+        """Loads images from spritesheet.
+        """
+
+        self.walk_images = [
+            self.game.enemy_spritesheet.get_image(52, 125, 50, 28, scale=1.5),
+            self.game.enemy_spritesheet.get_image(0, 125, 51, 26, scale=1.5)
+        ]
+
+        for frame in self.walk_images:
+            frame.set_colorkey(s.BLACK)
+
+        self.die_image = self.game.enemy_spritesheet.get_image(0, 112, 59, 12)
+        self.die_image.set_colorkey(s.BLACK)
+
+    def update(self):
+        """Update the sprite.
+
+        Animate, Update position, kill if out of screen.
+        """
+
+        self.animate()
+
+        self.rect.x -= self.vx
+
+        if self.rect.right < 0:
+            self.kill()
+
+    def animate(self):
+        """Handles sprite animation.
+        """
+
+        now = pygame.time.get_ticks()
+
+        if now - self.last_update > 180:
+            self.last_update = now
+            self.current_frame = (self.current_frame + 1) % len(self.walk_images)
+            self.image = self.walk_images[self.current_frame]
 
         self.mask = pygame.mask.from_surface(self.image)
