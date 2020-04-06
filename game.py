@@ -100,6 +100,7 @@ class CoronaBreakout:
             c.rect.x -= random.randrange(200, 400, 50)
 
         # load music
+        pygame.mixer.music.load(os.path.join(self.sound_dir, "background.ogg"))
 
         self.run()
 
@@ -110,10 +111,10 @@ class CoronaBreakout:
         and finally draws updated objects to the screen.
         """
 
-        # load music
+        # play loaded background music
+        pygame.mixer.music.play(loops=-1)
 
         self.playing = True
-
         while self.playing:
             self.clock.tick(s.FPS)
             self.events()
@@ -274,11 +275,11 @@ class CoronaBreakout:
         Main menu of the game.
         """
 
-        pygame.mixer.music.load(os.path.join(self.sound_dir, "st.ogg"))
+        pygame.mixer.music.load(os.path.join(self.sound_dir, "start_screen.ogg"))
         pygame.mixer.music.play(loops=-1)
 
         ss_image = pygame.image.load(os.path.join(self.img_dir, 'startscreen.jpeg')).convert()
-        ss_image = pygame.transform.scale(ss_image, (640, 480))
+        ss_image = pygame.transform.scale(ss_image, (s.WIDTH, s.HEIGHT))
 
         self.screen.blit(ss_image, (0, 0))
 
