@@ -289,8 +289,8 @@ class CoronaBreakout:
                        s.WIDTH / 2, s.HEIGHT * 0.5)
         self.draw_text('Press any key to play', 22, s.WHITE,
                        s.WIDTH / 2, s.HEIGHT * 0.6)"""
-        self.draw_text(f'High Score: {self.highscore}', 22, s.WHITE,
-                       s.WIDTH / 2, s.HEIGHT * 0.7)
+        """self.draw_text(f 'High Score: {self.highscore}', 22, s.WHITE,
+                       s.WIDTH / 2, s.HEIGHT * 0.7)"""
 
         pygame.display.update()
         self.wait_for_key()
