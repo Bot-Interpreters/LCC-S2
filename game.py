@@ -270,8 +270,8 @@ class CoronaBreakout:
 
         self.screen.blit(ss_image, (0, 0))
 
-        self.draw_text(s.TITLE, 48, s.WHITE,
-                       s.WIDTH / 2, s.HEIGHT * 1 / 5)
+        """self.draw_text(s.TITLE, 48, s.WHITE,
+                       s.WIDTH / 2, s.HEIGHT * 1 / 5)"""
         self.draw_text('Arrows to move and jump, space to shoot.', 22, s.WHITE,
                        s.WIDTH / 2, s.HEIGHT * 0.5)
         self.draw_text('Press any key to play', 22, s.WHITE,
