@@ -58,6 +58,7 @@ class CoronaBreakout:
         # load sounds
         self.jump_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, 'jump.wav'))
         self.powerup_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, 'powerup.wav'))
+        self.dead_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, 'dead.wav'))
 
     def new(self):
         """Start a new game.
@@ -162,6 +163,7 @@ class CoronaBreakout:
         # enemy hit?
         enemy_hits = pygame.sprite.spritecollide(self.player, self.enemies, True, pygame.sprite.collide_mask)
         if enemy_hits:
+            self.dead_sound.play()
             self.playing = False
 
         # create new bases as player moves
@@ -351,7 +353,7 @@ class CoronaBreakout:
                     waiting = False
                     self.running = False
 
-                if event.type == pygame.KEYUP and all(pygame.key.get_pressed()) == 0:
+                if all(pygame.key.get_pressed()) == 0 and event.type == pygame.KEYUP:
                     waiting = False
 
     def draw_text(self, text, size, color, x, y):
