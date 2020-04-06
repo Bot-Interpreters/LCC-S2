@@ -2,7 +2,7 @@ import os
 import pygame
 import random
 import settings as s
-from sprites import SpriteSheet, Platform, Player, Base
+from sprites import SpriteSheet, Platform, Player, Base, Cloud
 
 
 class CoronaBreakout:
@@ -49,6 +49,12 @@ class CoronaBreakout:
         # load base image
         self.base_img = pygame.image.load(os.path.join(self.img_dir, 'grassCenter.png'))
 
+        # load cloud images
+        self.cloud_images = []
+        cloud_dir = os.path.join(self.img_dir, 'clouds')
+        for i in range(1, 4):
+            self.cloud_images.append(pygame.image.load(os.path.join(cloud_dir, f'cloud{i}.png')).convert())
+
         # load sounds
 
     def new(self):
@@ -62,6 +68,7 @@ class CoronaBreakout:
         self.platforms = pygame.sprite.Group()
         self.powerups = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
+        self.clouds = pygame.sprite.Group()
 
         # create new instance of player
         self.player = Player(self)
@@ -79,6 +86,9 @@ class CoronaBreakout:
             Platform(self, *plat)
 
         # create clouds/other images
+        for i in range(5):
+            c = Cloud(self)
+            c.rect.x -= random.randrange(200, 400, 50)
 
         # load music
 
@@ -136,11 +146,11 @@ class CoronaBreakout:
         self.all_sprites.update()
 
         # create new bases are player moves
-        # last_base = self.bases[-1]
-        # if last_base.rect.right <= s.WIDTH:
-        #     new_base = Base(self, last_base.rect.right, s.HEIGHT - s.BASE_HEIGHT)
-        #     self.bases.append(new_base)
-        #     self.bases.pop(0)
+        last_base = self.bases[-1]
+        if last_base.rect.right <= s.WIDTH:
+            new_base = Base(self, last_base.rect.right, s.HEIGHT - s.BASE_HEIGHT)
+            self.bases.append(new_base)
+            self.bases.pop(0)
 
         # player - base collision check
         base_hits = pygame.sprite.spritecollide(self.player, self.bases, False)
@@ -182,8 +192,12 @@ class CoronaBreakout:
 
         # moving screen towards right
         if self.player.rect.right >= s.WIDTH * 0.45:
+            if random.randrange(100) < s.CLOUD_FREQ:
+                Cloud(self)
             if self.player.vel.x > 0:
                 self.player.pos.x -= max(self.player.vel.x, 3)
+                for cloud in self.clouds:
+                    cloud.rect.x -= max(self.player.vel.x / 2, 3)
                 for plat in self.platforms:
                     plat.rect.x -= max(self.player.vel.x, 3)
                     if plat.rect.right <= 0:

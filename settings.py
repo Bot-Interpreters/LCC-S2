@@ -17,9 +17,10 @@ PLAYER_ACC = 0.6
 PLAYER_FRICTION = 0.12
 PLAYER_GRAV = 0.8
 PLAYER_JUMP_VEL = 20
-JUMP_THRESHOLD = 3
 PLAYER_RUN_FREQ = 60
 PLAYER_IDLE_FREQ = 100
+JUMP_THRESHOLD = 3
+CLOUD_FREQ = 2
 
 # starting platforms
 PLATFORM_START_LIST = [
@@ -30,6 +31,7 @@ PLATFORM_START_LIST = [
 # sprite layers
 PLATFORM_LAYER = 1
 PLAYER_LAYER = 1
+CLOUD_LAYER = 0
 
 # spritesheets
 ENEMY_SPRITESHEET = os.path.join('enemy', 'enemies_spritesheet.png')
