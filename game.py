@@ -49,11 +49,6 @@ class CoronaBreakout:
         # load base image
         self.base_img = pygame.image.load(os.path.join(self.img_dir, 'grassCenter.png')).convert()
 
-        # load background image
-        # bg_dir = os.path.join(self.img_dir, 'background')
-        # bg_image = pygame.image.load(os.path.join(bg_dir, 'night_city.png')).convert()
-        # self.bg_image = pygame.transform.scale(bg_image, (640, 480))
-
         # load cloud images
         self.cloud_images = []
         cloud_dir = os.path.join(self.img_dir, 'clouds')
@@ -308,6 +303,8 @@ class CoronaBreakout:
             return None
 
         # load music
+        pygame.mixer.music.load(os.path.join(self.sound_dir, "game_over.ogg"))
+        pygame.mixer.music.play(loops=-1)
 
         self.screen.fill(s.BGCOLOR)
 
@@ -332,6 +329,7 @@ class CoronaBreakout:
         self.wait_for_key()
 
         # fadeout music
+        pygame.mixer.music.fadeout(500)
 
     def show_pause_screen(self):
         """Pause screen.
