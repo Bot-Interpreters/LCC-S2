@@ -63,7 +63,7 @@ class Cloud(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, (int(self.rect.width * scale),
                                                          int(self.rect.height * scale)))
         self.rect.x = random.randrange(s.WIDTH, s.WIDTH + self.rect.width)
-        self.rect.y = random.randrange(s.HEIGHT - 500, s.HEIGHT - 100)
+        self.rect.y = random.randrange(0, s.HEIGHT - 350)
 
     def update(self):
         """Updates sprite.

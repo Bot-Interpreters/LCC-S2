@@ -50,7 +50,8 @@ class CoronaBreakout:
         self.base_img = pygame.image.load(os.path.join(self.img_dir, 'grassCenter.png')).convert()
 
         # load background image
-        bg_image = pygame.image.load(os.path.join(self.img_dir, 'startscreen.jpg')).convert()
+        bg_dir = os.path.join(self.img_dir, 'background')
+        bg_image = pygame.image.load(os.path.join(bg_dir, 'night_city.png')).convert()
         self.bg_image = pygame.transform.scale(bg_image, (640, 480))
 
         # load cloud images
@@ -244,7 +245,7 @@ class CoronaBreakout:
         """Draw updated objects to the screen.
         """
 
-        self.screen.fill(s.BGCOLOR)
+        self.screen.blit(self.bg_image, (0, 0))
 
         # draw all sprites
         self.all_sprites.draw(self.screen)
@@ -259,11 +260,13 @@ class CoronaBreakout:
         Main menu of the game.
         """
 
-        # load music
         pygame.mixer.music.load(os.path.join(self.sound_dir, "st.ogg"))
         pygame.mixer.music.play(loops=-1)
 
-        self.screen.blit(self.bg_image, (0, 0))
+        ss_image = pygame.image.load(os.path.join(self.img_dir, 'startscreen.jpg')).convert()
+        ss_image = pygame.transform.scale(ss_image, (640, 480))
+
+        self.screen.blit(ss_image, (0, 0))
 
         self.draw_text(s.TITLE, 48, s.WHITE,
                        s.WIDTH / 2, s.HEIGHT * 1 / 5)
