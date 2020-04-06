@@ -106,9 +106,9 @@ class Platform(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
-        # spawn a powerup on the platform
+        # spawn a vaccine on the platform
         if random.randrange(100) < s.POWERUP_SPAWN_FREQ:
-            PowerUp(self.game, self)
+            Vaccine(self.game, self)
 
 
 class Base(pygame.sprite.Sprite):
@@ -430,12 +430,12 @@ class Slime(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
 
 
-class PowerUp(pygame.sprite.Sprite):
-    """A base class for all the powerups.
+class Vaccine(pygame.sprite.Sprite):
+    """A vaccine sprite that boosts score.
     """
 
     def __init__(self, game, plat):
-        """Initialize a powerup.
+        """Initialize sprite.
 
         We need a platform sprite to spawn the powerup on.
 
@@ -446,7 +446,7 @@ class PowerUp(pygame.sprite.Sprite):
 
         self._layer = s.POW_LAYER
         groups = game.all_sprites, game.powerups
-        super(PowerUp, self).__init__(groups)
+        super(Vaccine, self).__init__(groups)
 
         self.game = game
         self.plat = plat
