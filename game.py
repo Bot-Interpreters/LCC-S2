@@ -273,17 +273,17 @@ class CoronaBreakout:
         pygame.mixer.music.load(os.path.join(self.sound_dir, "st.ogg"))
         pygame.mixer.music.play(loops=-1)
 
-        ss_image = pygame.image.load(os.path.join(self.img_dir, 'startscreen.jpg')).convert()
+        ss_image = pygame.image.load(os.path.join(self.img_dir, 'startscreen.jpeg')).convert()
         ss_image = pygame.transform.scale(ss_image, (640, 480))
 
         self.screen.blit(ss_image, (0, 0))
 
         """self.draw_text(s.TITLE, 48, s.WHITE,
-                       s.WIDTH / 2, s.HEIGHT * 1 / 5)"""
+                       s.WIDTH / 2, s.HEIGHT * 1 / 5)
         self.draw_text('Arrows to move and jump, space to shoot.', 22, s.WHITE,
                        s.WIDTH / 2, s.HEIGHT * 0.5)
         self.draw_text('Press any key to play', 22, s.WHITE,
-                       s.WIDTH / 2, s.HEIGHT * 0.6)
+                       s.WIDTH / 2, s.HEIGHT * 0.6)"""
         self.draw_text(f'High Score: {self.highscore}', 22, s.WHITE,
                        s.WIDTH / 2, s.HEIGHT * 0.7)
 
