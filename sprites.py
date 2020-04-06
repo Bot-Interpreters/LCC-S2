@@ -478,3 +478,29 @@ class Vaccine(pygame.sprite.Sprite):
 
         if not self.game.platforms.has(self.plat):
             self.kill()
+
+
+class BackGround(pygame.sprite.Sprite):
+    """A class for bg images.
+
+    Used only for layering functionality.
+    """
+
+    def __init__(self, game):
+        """Initializing a new background.
+
+        Args:
+            game (game_instance): Game instance.
+        """
+
+        self._layer = s.BG_IMAGE_LAYER
+        groups = game.all_sprites
+        super(BackGround, self).__init__(groups)
+
+        self.game = game
+
+        bg_dir = os.path.join(self.game.img_dir, 'background')
+        image = pygame.image.load(os.path.join(bg_dir, 'night_city.png')).convert_alpha()
+        image.set_colorkey(s.BLACK)
+        self.image = pygame.transform.scale(image, (640, 480))
+        self.rect = self.image.get_rect()

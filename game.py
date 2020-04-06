@@ -2,7 +2,7 @@ import os
 import pygame
 import random
 import settings as s
-from sprites import SpriteSheet, Platform, Player, Base, Cloud, Slime
+from sprites import SpriteSheet, Platform, Player, Base, Cloud, Slime, BackGround
 
 
 class CoronaBreakout:
@@ -50,9 +50,9 @@ class CoronaBreakout:
         self.base_img = pygame.image.load(os.path.join(self.img_dir, 'grassCenter.png')).convert()
 
         # load background image
-        bg_dir = os.path.join(self.img_dir, 'background')
-        bg_image = pygame.image.load(os.path.join(bg_dir, 'night_city.png')).convert()
-        self.bg_image = pygame.transform.scale(bg_image, (640, 480))
+        # bg_dir = os.path.join(self.img_dir, 'background')
+        # bg_image = pygame.image.load(os.path.join(bg_dir, 'night_city.png')).convert()
+        # self.bg_image = pygame.transform.scale(bg_image, (640, 480))
 
         # load cloud images
         self.cloud_images = []
@@ -74,6 +74,9 @@ class CoronaBreakout:
         self.powerups = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
         self.clouds = pygame.sprite.Group()
+
+        # load bg image
+        self.bg_image = BackGround(self)
 
         # create new instance of player
         self.player = Player(self)
@@ -218,7 +221,7 @@ class CoronaBreakout:
                 self.player.pos.x -= max(self.player.vel.x, 3)
                 # updating previous clouds
                 for cloud in self.clouds:
-                    cloud.rect.x -= max(self.player.vel.x / 2, 3)
+                    cloud.rect.x -= max(self.player.vel.x / 4, 3)
                 # updating platforms
                 for plat in self.platforms:
                     plat.rect.x -= max(self.player.vel.x, 3)
@@ -254,10 +257,11 @@ class CoronaBreakout:
         """Draw updated objects to the screen.
         """
 
-        self.screen.blit(self.bg_image, (0, 0))
+        self.screen.fill(s.BLACK)
 
         # draw all sprites
         self.all_sprites.draw(self.screen)
+        self.enemies.draw(self.screen)
 
         # draw texts
         self.draw_text(f'Score: {self.score}', 22, s.WHITE, s.WIDTH / 2, 15)

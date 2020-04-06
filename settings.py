@@ -29,11 +29,12 @@ PLATFORM_START_LIST = [
 ]
 
 # sprite layers
-PLATFORM_LAYER = 1
-POW_LAYER = 1
-PLAYER_LAYER = 2
 CLOUD_LAYER = 0
-ENEMY_LAYER = 2
+BG_IMAGE_LAYER = 1
+PLATFORM_LAYER = 2
+POW_LAYER = 2
+PLAYER_LAYER = 3
+ENEMY_LAYER = 3
 
 # spritesheets
 ENEMY_SPRITESHEET = os.path.join('enemy', 'enemies_spritesheet.png')
