@@ -56,6 +56,8 @@ class CoronaBreakout:
             self.cloud_images.append(pygame.image.load(os.path.join(cloud_dir, f'cloud{i}.png')).convert())
 
         # load sounds
+        self.jump_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, 'jump.wav'))
+        self.powerup_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, 'powerup.wav'))
 
     def new(self):
         """Start a new game.
@@ -244,8 +246,7 @@ class CoronaBreakout:
         # player - powerup collision check
         pow_hits = pygame.sprite.spritecollide(self.player, self.powerups, True)
         for powerUp in pow_hits:
-            # play sound
-
+            self.powerup_sound.play()
             # add points to score
             self.score += 10
 
@@ -349,7 +350,8 @@ class CoronaBreakout:
                 if event.type == pygame.QUIT:
                     waiting = False
                     self.running = False
-                if event.type == pygame.KEYUP:
+
+                if event.type == pygame.KEYUP and all(pygame.key.get_pressed()) == 0:
                     waiting = False
 
     def draw_text(self, text, size, color, x, y):

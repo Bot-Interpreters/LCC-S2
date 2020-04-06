@@ -262,7 +262,7 @@ class Player(pygame.sprite.Sprite):
         hits = plat_hits or base_hits
 
         if hits and not self.jumping:
-            # add sound for jumping
+            self.game.jump_sound.play()
             self.jumping = True
             self.vel.y = s.PLAYER_JUMP_VEL * -1
 
