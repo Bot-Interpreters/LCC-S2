@@ -221,7 +221,7 @@ class CoronaBreakout:
                 self.player.pos.x -= max(self.player.vel.x, 3)
                 # updating previous clouds
                 for cloud in self.clouds:
-                    cloud.rect.x -= max(self.player.vel.x / 4, 3)
+                    cloud.rect.x -= max(self.player.vel.x / 6, 1)
                 # updating platforms
                 for plat in self.platforms:
                     plat.rect.x -= max(self.player.vel.x, 3)
