@@ -288,7 +288,7 @@ class CoronaBreakout:
         self.draw_text('Press any key to play', 22, s.WHITE,
                        s.WIDTH / 2, s.HEIGHT * 0.6)"""
         self.draw_text(str(self.highscore), 22, s.WHITE,
-                       s.WIDTH * 0.59, s.HEIGHT * 0.707)
+                       s.WIDTH * 0.61, s.HEIGHT * 0.705)
 
         pygame.display.update()
         self.wait_for_key()
@@ -309,13 +309,16 @@ class CoronaBreakout:
         pygame.mixer.music.load(os.path.join(self.sound_dir, "game_over.ogg"))
         pygame.mixer.music.play(loops=-1)
 
-        self.screen.fill(s.BGCOLOR)
+        go_image = pygame.image.load(os.path.join(self.img_dir, 'gameover.jpg')).convert()
+        go_image = pygame.transform.scale(go_image, (s.WIDTH, s.HEIGHT))
 
-        self.draw_text("GAME OVER", 48, s.WHITE, s.WIDTH / 2, s.HEIGHT / 4)
-        self.draw_text(f'Score: {self.score}', 22, s.WHITE,
-                       s.WIDTH / 2, s.HEIGHT / 2)
-        self.draw_text('Press a key to play again', 22, s.WHITE,
-                       s.WIDTH / 2, s.HEIGHT * 3 / 4)
+        self.screen.blit(go_image, (0, 0))
+
+        # self.draw_text("GAME OVER", 48, s.WHITE, s.WIDTH / 2, s.HEIGHT / 4)
+        self.draw_text(str(self.score), 35, s.RED,
+                       s.WIDTH * 0.63, s.HEIGHT * 0.82)
+        # self.draw_text('Press a key to play again', 22, s.WHITE,
+        #                s.WIDTH / 2, s.HEIGHT * 3 / 4)
 
         # draw texts/buttons
 
@@ -345,6 +348,7 @@ class CoronaBreakout:
         """
 
         waiting = True
+        pygame.time.wait(1000)
         while waiting:
             self.clock.tick(s.FPS)
 
@@ -353,7 +357,7 @@ class CoronaBreakout:
                     waiting = False
                     self.running = False
 
-                if all(pygame.key.get_pressed()) == 0 and event.type == pygame.KEYUP:
+                if event.type == pygame.KEYUP:
                     waiting = False
 
     def draw_text(self, text, size, color, x, y):
