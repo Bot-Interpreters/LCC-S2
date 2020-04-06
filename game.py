@@ -224,6 +224,7 @@ class CoronaBreakout:
                     plat.rect.x -= max(self.player.vel.x, 3)
                     if plat.rect.right <= 0:
                         plat.kill()
+                        self.score += 1
                 # updating enemies
                 for enemy in self.enemies:
                     enemy.rect.x -= max(self.player.vel.x, 3)
@@ -251,6 +252,7 @@ class CoronaBreakout:
         self.all_sprites.draw(self.screen)
 
         # draw texts
+        self.draw_text(f'Score: {self.score}', 22, s.WHITE, s.WIDTH / 2, 15)
 
         pygame.display.update()
 
