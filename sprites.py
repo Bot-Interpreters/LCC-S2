@@ -272,6 +272,10 @@ class Player(pygame.sprite.Sprite):
         # x = ut + 0.5 * at**2 | t = 1
         self.pos += self.vel + 0.5 * self.acc
 
+        # prevent player from going towards left
+        if self.rect.left < 0:
+            self.pos.x = self.rect.left + 50
+
         # update the position of the sprite with calculated pos
         self.rect.midbottom = self.pos
 

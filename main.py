@@ -75,7 +75,7 @@ class CoronaBreakout:
             self.bases.append(base)
 
         # creating starting platforms
-        for plat in s.PLATFORM_LIST:
+        for plat in s.PLATFORM_START_LIST:
             Platform(self, *plat)
 
         # create clouds/other images
@@ -118,7 +118,8 @@ class CoronaBreakout:
             # keydown space to jump
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
-                    self.player.jump()
+                    if not self.player.jumping:
+                        self.player.jump()
 
             # keyup space to jump_cut
             if event.type == pygame.KEYUP:
@@ -147,7 +148,7 @@ class CoronaBreakout:
             lowest = base_hits[0]
             # if player below base, make him rest on base
             if self.player.pos.y > lowest.rect.top:
-                self.player.pos.y = lowest.rect.top
+                self.player.pos.y = lowest.rect.top + 5
                 self.player.vel.y = 0
                 self.player.jumping = False
 
@@ -158,39 +159,48 @@ class CoronaBreakout:
 
         try:
             if plat_hits:
-                lowest = plat_hits[0]
+                plat = plat_hits[0]
+                for hit in plat_hits:
+                    if hit.rect.left > plat.rect.left:
+                        plat = hit
 
                 # if player is within the platforms's width
-                if self.player.pos.x - self.player.rect.width / 2 < lowest.rect.right and \
-                        self.player.pos.x + self.player.rect.width / 2 > lowest.rect.left:
+                if self.player.pos.x - self.player.rect.width / 2 < plat.rect.right and \
+                        self.player.pos.x + self.player.rect.width / 2 > plat.rect.left:
                     # if player is above platform, make him rest on platform
-                    if self.player.pos.y < lowest.rect.centery:
-                        self.player.pos.y = lowest.rect.top + 5  # to compensate for extra space below in image
+                    if self.player.pos.y < plat.rect.centery:
+                        self.player.pos.y = plat.rect.top + 5  # to compensate for extra space below in image
                         self.player.vel.y = 0
                         self.player.jumping = False
                     # if player is below the platform, and was going/jumping up, restrict his jump
-                    if self.player.pos.y > lowest.rect.bottom and self.player.vel.y < 0:
-                        self.player.pos.y = lowest.rect.bottom + self.player.rect.height
+                    if self.player.pos.y > plat.rect.bottom and self.player.vel.y < 0:
+                        self.player.pos.y = plat.rect.bottom + self.player.rect.height
                         self.player.vel.y = 0
                         self.player.jumping = False
         except Exception:
             pass
 
-        '''
         # moving screen towards right
-        if self.player.rect.right >= s.WIDTH * 1 / 2:
-            if not self.player.jumping:
-                self.player.pos.x -= max(abs(self.player.vel.x), 2)
-            for plat in self.platforms:
-                plat.rect.x -= max(abs(self.player.vel.y), 2)
-                if plat.rect.right <= 0:
-                    plat.kill()
+        if self.player.rect.right >= s.WIDTH * 0.45:
+            if self.player.vel.x > 0:
+                self.player.pos.x -= max(self.player.vel.x, 3)
+                for plat in self.platforms:
+                    plat.rect.x -= max(self.player.vel.x, 3)
+                    if plat.rect.right <= 0:
+                        plat.kill()
 
         # spawn new platforms
-        while len(self.platforms) < 12:
-            Platform(self, random.randrange(s.WIDTH - 50, s.WIDTH - 100),
-                     random.randrange(s.HEIGHT - 100, s.HEIGHT - 200))
-        '''
+        # calculate the right pos of previous platform
+        max_right = 0
+        for plat in self.platforms:
+            if plat.rect.right > max_right:
+                max_right = plat.rect.right
+
+        # create new platforms, max of 3 platforms available at a time.
+        while len(self.platforms) < 3:
+            rand_x = max_right + random.randrange(50, 400)
+            rand_y = s.HEIGHT - 150 - s.BASE_HEIGHT - random.randrange(0, 100, 20)
+            Platform(self, rand_x, rand_y)
 
     def draw(self):
         """Draw updated objects to the screen.

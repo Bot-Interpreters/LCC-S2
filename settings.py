@@ -1,5 +1,5 @@
 import os
-import settings as s
+import random
 
 # game options/settings
 TITLE = 'Corona Breakout'
@@ -18,13 +18,13 @@ PLAYER_FRICTION = 0.12
 PLAYER_GRAV = 0.8
 PLAYER_JUMP_VEL = 20
 JUMP_THRESHOLD = 3
-PLAYER_RUN_FREQ = 70
+PLAYER_RUN_FREQ = 60
 PLAYER_IDLE_FREQ = 100
 
 # starting platforms
-PLATFORM_LIST = [
-    (s.WIDTH / 2, s.HEIGHT / 2),
-    (s.WIDTH * 0.75, s.HEIGHT * 0.25)
+PLATFORM_START_LIST = [
+    (WIDTH / 2, HEIGHT / 2),
+    (WIDTH * 0.75, HEIGHT * 0.25)
 ]
 
 # sprite layers
