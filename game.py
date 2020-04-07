@@ -345,7 +345,7 @@ class CoronaBreakout:
         """
 
         waiting = True
-        pygame.time.wait(1000)
+        pressed = False
         while waiting:
             self.clock.tick(s.FPS)
 
@@ -354,7 +354,10 @@ class CoronaBreakout:
                     waiting = False
                     self.running = False
 
-                if event.type == pygame.KEYUP:
+                if event.type == pygame.KEYDOWN:
+                    pressed = True
+
+                if event.type == pygame.KEYUP and pressed:
                     waiting = False
 
     def draw_text(self, text, size, color, x, y):
