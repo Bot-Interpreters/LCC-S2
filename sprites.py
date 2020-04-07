@@ -147,12 +147,10 @@ class Player(pygame.sprite.Sprite):
         super(Player, self).__init__(groups)
 
         self.game = game
-        # self.idle = True
+        self.idle = True
         self.running = False
         self.jumping = False
-        self.isRight = True
-        # self.shooting = False
-        # self.hurt = False
+        self.shooting = False
         self.lives = 3
 
         # tracking for animation
@@ -190,19 +188,19 @@ class Player(pygame.sprite.Sprite):
             self.standing_frames_l.append(pygame.transform.flip(frame, True, False))
 
         # hurt frames
-        self.hurt_frames_r = []
-        hurt_dir = os.path.join(self.game.img_dir, s.PLAYER_HURT)
-        for image in os.listdir(hurt_dir):
-            frame = pygame.image.load(os.path.join(hurt_dir, image)).convert()
-            rect = frame.get_rect()
-            frame = pygame.transform.scale(frame, (int(rect.width * 0.2),
-                                                   int(rect.height * 0.2)))
-            frame.set_colorkey(s.BLACK)
-            self.hurt_frames_r.append(frame)
+        # self.hurt_frames_r = []
+        # hurt_dir = os.path.join(self.game.img_dir, s.PLAYER_HURT)
+        # for image in os.listdir(hurt_dir):
+        #     frame = pygame.image.load(os.path.join(hurt_dir, image)).convert()
+        #     rect = frame.get_rect()
+        #     frame = pygame.transform.scale(frame, (int(rect.width * 0.2),
+        #                                            int(rect.height * 0.2)))
+        #     frame.set_colorkey(s.BLACK)
+        #     self.hurt_frames_r.append(frame)
 
-        self.hurt_frames_l = []
-        for frame in self.hurt_frames_r:  # flip x, and not y
-            self.hurt_frames_l.append(pygame.transform.flip(frame, True, False))
+        # self.hurt_frames_l = []
+        # for frame in self.hurt_frames_r:  # flip x, and not y
+        #     self.hurt_frames_l.append(pygame.transform.flip(frame, True, False))
 
         # jumping frames
         self.jumping_frames_r = []
@@ -265,6 +263,7 @@ class Player(pygame.sprite.Sprite):
         if hits and not self.jumping:
             self.game.jump_sound.play()
             self.jumping = True
+            self.idle = False
             self.vel.y = s.PLAYER_JUMP_VEL * -1
 
     def jump_cut(self):
@@ -324,8 +323,10 @@ class Player(pygame.sprite.Sprite):
 
         if self.vel.x != 0:
             self.running = True
+            self.idle = False
         else:
             self.running = False
+            self.idle = True
 
         # show running animation
         if self.running:
@@ -344,24 +345,28 @@ class Player(pygame.sprite.Sprite):
                 self.rect.bottom = bottom
 
         # show idle animation
-        if not self.jumping and not self.running:
+        if self.idle:
             if now - self.last_update > s.PLAYER_IDLE_FREQ:
                 self.last_update = now
                 # get index of the next frame
                 self.current_frame = (self.current_frame + 1) % len(self.standing_frames_r)
                 bottom = self.rect.bottom
-
-                if self.pos.x > 0:
-                    self.image = self.standing_frames_r[self.current_frame]
-                else:
-                    self.image = self.standing_frames_l[self.current_frame]
-
+                # set image
+                self.image = self.standing_frames_r[self.current_frame]
                 self.rect = self.image.get_rect()
                 self.rect.bottom = bottom
 
-        # show shooting animation
+        if self.jumping:
+            bottom = self.rect.bottom
+            if self.vel.x < 0:
+                self.image = self.jumping_frames_l[0]
+            else:
+                self.image = self.jumping_frames_r[0]
 
-        # show hurt animation
+            self.rect = self.image.get_rect()
+            self.rect.bottom = bottom
+
+        # show shooting animation
 
         self.mask = pygame.mask.from_surface(self.image)
 
