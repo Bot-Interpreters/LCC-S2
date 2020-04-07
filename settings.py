@@ -11,6 +11,7 @@ HS_FILE = 'highscore.txt'
 # game properties
 BASE_HEIGHT = 35
 POWERUP_SPAWN_FREQ = 50
+CLOUD_FREQ = 1
 
 # player properties
 PLAYER_ACC = 0.6
@@ -19,8 +20,9 @@ PLAYER_GRAV = 0.8
 PLAYER_JUMP_VEL = 20
 PLAYER_RUN_FREQ = 60
 PLAYER_IDLE_FREQ = 100
+BULLET_VEL = 7
+BULLET_SHOOT_FREQ = 1000
 JUMP_THRESHOLD = 3
-CLOUD_FREQ = 1
 
 # starting platforms
 PLATFORM_START_LIST = [
@@ -35,6 +37,7 @@ PLATFORM_LAYER = 2
 POW_LAYER = 2
 PLAYER_LAYER = 3
 ENEMY_LAYER = 3
+BULLET_LAYER = 3
 
 # spritesheets
 ENEMY_SPRITESHEET = os.path.join('enemy', 'enemies_spritesheet.png')

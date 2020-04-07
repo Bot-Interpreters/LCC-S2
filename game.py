@@ -2,7 +2,7 @@ import os
 import pygame
 import random
 import settings as s
-from sprites import SpriteSheet, Platform, Player, Base, Cloud, Slime, BackGround
+from sprites import SpriteSheet, Platform, Player, Base, Cloud, Slime, BackGround, Bullet
 
 
 class CoronaBreakout:
@@ -71,6 +71,7 @@ class CoronaBreakout:
         self.platforms = pygame.sprite.Group()
         self.powerups = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
+        self.bullets = pygame.sprite.Group()
         self.clouds = pygame.sprite.Group()
 
         # load bg image
@@ -133,16 +134,30 @@ class CoronaBreakout:
 
             # escape key to pause
 
-            # keydown space to jump
             if event.type == pygame.KEYDOWN:
+                # keydown space to jump
                 if event.key == pygame.K_UP:
                     if not self.player.jumping:
                         self.player.jump()
 
-            # keyup space to jump_cut
             if event.type == pygame.KEYUP:
+                # keyup space to jump_cut
                 if event.key == pygame.K_UP:
                     self.player.jump_cut()
+
+                if event.key == pygame.K_SPACE:
+                    # set shooting to False
+                    self.player.shooting = False
+
+            if event.type == pygame.KEYDOWN:
+                # player shooting
+                if event.key == pygame.K_SPACE:
+                    # only if not already shooting
+                    # prevents spawn of multiple bullets at the same press
+                    if not self.player.shooting:
+                        self.player.shooting = True
+                        self.player.idle = False
+                        Bullet(self)
 
     def update(self):
         """Updates attributes of objects.
@@ -160,6 +175,13 @@ class CoronaBreakout:
             self.enemy_timer = now
             Slime(self)
 
+        # create new bases as player moves
+        last_base = self.bases[-1]
+        if last_base.rect.right <= s.WIDTH:
+            new_base = Base(self, last_base.rect.right, s.HEIGHT - s.BASE_HEIGHT)
+            self.bases.append(new_base)
+            self.bases.pop(0)
+
         # player - enemy collision check
         enemy_hits = pygame.sprite.spritecollide(self.player, self.enemies, True, pygame.sprite.collide_mask)
         if enemy_hits:
@@ -170,12 +192,8 @@ class CoronaBreakout:
             if self.player.lives == 0:
                 self.playing = False
 
-        # create new bases as player moves
-        last_base = self.bases[-1]
-        if last_base.rect.right <= s.WIDTH:
-            new_base = Base(self, last_base.rect.right, s.HEIGHT - s.BASE_HEIGHT)
-            self.bases.append(new_base)
-            self.bases.pop(0)
+        # bullet - enemy collision check
+        be_hits = pygame.sprite.groupcollide(self.enemies, self.bullets, True, True)
 
         # player - base collision check
         base_hits = pygame.sprite.spritecollide(self.player, self.bases, False)

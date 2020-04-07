@@ -371,6 +371,57 @@ class Player(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
 
 
+class Bullet(pygame.sprite.Sprite):
+
+    def __init__(self, game):
+        """Initialize a bullet sprite.
+
+        Bullets will be fired by the player. Enemy dies if bullet hit.
+
+        Args:
+            game (game_instance): Game instance.
+        """
+
+        self._layer = s.BULLET_LAYER
+        groups = game.all_sprites, game.bullets
+        super(Bullet, self).__init__(groups)
+
+        self.game = game
+        self.vel = s.BULLET_VEL
+
+        self.load_images()
+        self.rect = self.image.get_rect()
+
+        # if player moves towards left while shooting
+        if self.game.player.vel.x < 0:
+            self.vel *= -1
+            self.rect.right = self.game.player.rect.left
+        else:
+            self.rect.left = self.game.player.rect.right
+
+        self.rect.bottom = self.game.player.rect.centery + 30
+
+    def load_images(self):
+        """Loads all necessary images.
+        """
+
+        # starting image
+        self.image = self.game.expl_spritesheet.get_image(304, 580, 12, 12, scale=1.5)
+
+    def update(self):
+
+        # self.animate()
+
+        # move bullet across screen
+        self.rect.x += self.vel
+
+        # if bullet out of screen, kill it
+        if self.rect.left > s.WIDTH:
+            self.kill()
+
+        self.mask = pygame.mask.from_surface(self.image)
+
+
 class Slime(pygame.sprite.Sprite):
 
     def __init__(self, game):
