@@ -132,7 +132,6 @@ class CoronaBreakout:
                 self.running = False  # closes the whole game
 
             # escape key to pause
-
             # keydown space to jump
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
