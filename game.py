@@ -59,6 +59,7 @@ class CoronaBreakout:
         self.jump_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, 'jump.wav'))
         self.powerup_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, 'powerup.wav'))
         self.dead_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, 'dead.wav'))
+        self.bullet_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, 'bullet.wav'))
 
     def new(self):
         """Start a new game.
@@ -157,6 +158,7 @@ class CoronaBreakout:
                     if not self.player.shooting:
                         self.player.shooting = True
                         self.player.idle = False
+                        self.bullet_sound.play()
                         Bullet(self)
 
     def update(self):
@@ -194,6 +196,12 @@ class CoronaBreakout:
 
         # bullet - enemy collision check
         be_hits = pygame.sprite.groupcollide(self.enemies, self.bullets, True, True)
+        if be_hits:
+            self.dead_sound.play()
+            self.score += 20
+
+        # bullet - platform collision check
+        pygame.sprite.groupcollide(self.bullets, self.platforms, True, False)
 
         # player - base collision check
         base_hits = pygame.sprite.spritecollide(self.player, self.bases, False)
@@ -204,6 +212,13 @@ class CoronaBreakout:
                 self.player.pos.y = lowest.rect.top + 5
                 self.player.vel.y = 0
                 self.player.jumping = False
+
+        # player - powerup collision check
+        pow_hits = pygame.sprite.spritecollide(self.player, self.powerups, True)
+        for powerUp in pow_hits:
+            self.powerup_sound.play()
+            # add points to score
+            self.score += 10
 
         # player - platform collision check
         temp_plat_hits = pygame.sprite.spritecollide(self.player, self.platforms, False)  # BB check
@@ -266,13 +281,6 @@ class CoronaBreakout:
             rand_x = max_right + random.randrange(200, 400)
             rand_y = s.HEIGHT - 150 - s.BASE_HEIGHT - random.randrange(0, 100, 20)
             Platform(self, rand_x, rand_y)
-
-        # player - powerup collision check
-        pow_hits = pygame.sprite.spritecollide(self.player, self.powerups, True)
-        for powerUp in pow_hits:
-            self.powerup_sound.play()
-            # add points to score
-            self.score += 10
 
     def draw(self):
         """Draw updated objects to the screen.

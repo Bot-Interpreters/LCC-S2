@@ -418,6 +418,8 @@ class Bullet(pygame.sprite.Sprite):
         # if bullet out of screen, kill it
         if self.rect.left > s.WIDTH:
             self.kill()
+        elif self.rect.right < 0:
+            self.kill()
 
         self.mask = pygame.mask.from_surface(self.image)
 
