@@ -324,10 +324,7 @@ class CoronaBreakout:
 
         if self.score > self.highscore:
             self.highscore = self.score
-
-            self.draw_text('NEW HIGH SCORE!', 22, s.WHITE,
-                           s.WIDTH / 2, s.HEIGHT / 2 + 40)
-
+            # save highscore in local file
             with open(os.path.join(self.dir, s.HS_FILE), 'w') as f:
                 f.write(str(self.score))
 
