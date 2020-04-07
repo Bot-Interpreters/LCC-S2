@@ -19,6 +19,7 @@ class CoronaBreakout:
 
         self.clock = pygame.time.Clock()
         self.font_name = pygame.font.match_font(s.FONT_NAME)
+        self.paused = False
         self.running = True
         self.load_data()
 
@@ -48,6 +49,10 @@ class CoronaBreakout:
 
         # load base image
         self.base_img = pygame.image.load(os.path.join(self.img_dir, 'grassCenter.png')).convert()
+
+        # load pause screen image
+        image = pygame.image.load(os.path.join(self.img_dir, 'pausescreen.jpg')).convert()
+        self.pause_image = pygame.transform.scale(image, (s.WIDTH, s.HEIGHT))
 
         # load cloud images
         self.cloud_images = []
@@ -140,16 +145,6 @@ class CoronaBreakout:
                     if not self.player.jumping:
                         self.player.jump()
 
-            if event.type == pygame.KEYUP:
-                # keyup space to jump_cut
-                if event.key == pygame.K_UP:
-                    self.player.jump_cut()
-
-                if event.key == pygame.K_SPACE:
-                    # set shooting to False
-                    self.player.shooting = False
-
-            if event.type == pygame.KEYDOWN:
                 # player shooting
                 if event.key == pygame.K_SPACE:
                     # only if not already shooting
@@ -159,6 +154,21 @@ class CoronaBreakout:
                         self.player.idle = False
                         self.bullet_sound.play()
                         Bullet(self)
+
+            if event.type == pygame.KEYUP:
+                # keyup space to jump_cut
+                if event.key == pygame.K_UP:
+                    self.player.jump_cut()
+
+                if event.key == pygame.K_SPACE:
+                    # if user releases space, set shooting to False
+                    self.player.shooting = False
+
+                # pause
+                if event.key == pygame.K_ESCAPE:
+                    if not self.paused:
+                        self.paused = True
+                        self.show_pause_screen()
 
     def update(self):
         """Updates attributes of objects.
@@ -173,8 +183,9 @@ class CoronaBreakout:
 
         # spawn enemy?
         if now - self.enemy_timer > 5000 + random.choice([-1000, -500, 0, 500, 1000]):
-            self.enemy_timer = now
-            Slime(self)
+            if not self.paused:
+                self.enemy_timer = now
+                Slime(self)
 
         # create new bases as player moves
         last_base = self.bases[-1]
@@ -368,10 +379,20 @@ class CoronaBreakout:
         """Pause screen.
         """
 
-        pass
+        self.screen.blit(self.pause_image, (0, 0))
+        self.draw_text(str(self.score), 33, s.WHITE, s.WIDTH * 0.63, s.HEIGHT * 0.395)
 
-    def wait_for_key(self):
+        pygame.display.update()
+        # if escape key is pressed, game resumes
+        self.wait_for_key(pygame.K_ESCAPE)
+        self.paused = False
+
+    def wait_for_key(self, key=None):
         """Wait for a key press.
+
+        Args:
+            key (pygame.event.key, optional): Key to press to end waiting.
+                Defaults to None.
         """
 
         waiting = True
@@ -388,7 +409,10 @@ class CoronaBreakout:
                     pressed = True
 
                 if event.type == pygame.KEYUP and pressed:
-                    waiting = False
+                    if key is None:
+                        waiting = False
+                    elif event.key == key:
+                        waiting = False
 
     def draw_text(self, text, size, color, x, y):
         """Draws text to screen.
