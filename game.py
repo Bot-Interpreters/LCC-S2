@@ -70,7 +70,13 @@ class CoronaBreakout:
         """Start a new game.
         """
 
+        # keeping track of missions
         self.score = 0
+        self.vaccines_collected = 0
+        self.enemies_killed = 0
+
+        # used for checking if player completed game
+        self.platforms_crossed = 0
 
         # initialize sprite groups
         self.all_sprites = pygame.sprite.LayeredUpdates()
@@ -209,6 +215,7 @@ class CoronaBreakout:
         if be_hits:
             self.dead_sound.play()
             self.score += 20
+            self.enemies_killed += 1
 
         # bullet - platform collision check
         pygame.sprite.groupcollide(self.bullets, self.platforms, True, False)
@@ -229,6 +236,7 @@ class CoronaBreakout:
             self.powerup_sound.play()
             # add points to score
             self.score += 10
+            self.vaccines_collected += 1
 
         # player - platform collision check
         temp_plat_hits = pygame.sprite.spritecollide(self.player, self.platforms, False)  # BB check
@@ -275,6 +283,7 @@ class CoronaBreakout:
                     if plat.rect.right <= 0:
                         plat.kill()
                         self.score += 1
+                        self.platforms_crossed += 1
                 # updating enemies
                 for enemy in self.enemies:
                     enemy.rect.x -= max(self.player.vel.x, 3)
@@ -304,7 +313,10 @@ class CoronaBreakout:
 
         # draw texts
         self.draw_text(f'Score: {self.score}', 22, s.WHITE, s.WIDTH / 2, 15)
-        self.draw_text(f'Player lives remaining: {self.player.lives}', 22, s.RED, s.WIDTH / 6, 15)
+
+        self.draw_text(f'Player lives remaining: {self.player.lives}', 22, s.RED, s.WIDTH * 0.2, 15)
+        self.draw_text(f'Total Vaccines collected: {self.vaccines_collected} / {s.VAC_COLLECT}', 22, s.RED, s.WIDTH * 0.2, 37)
+        self.draw_text(f'Total enemies killed: {self.enemies_killed} / {s.ENEMY_KILLS}', 22, s.RED, s.WIDTH * 0.2, 57)
 
         pygame.display.update()
 
@@ -361,13 +373,13 @@ class CoronaBreakout:
         # self.draw_text('Press a key to play again', 22, s.WHITE,
         #                s.WIDTH / 2, s.HEIGHT * 3 / 4)
 
-        # draw texts/buttons
-
         if self.score > self.highscore:
             self.highscore = self.score
             # save highscore in local file
             with open(os.path.join(self.dir, s.HS_FILE), 'w') as f:
                 f.write(str(self.score))
+
+            self.draw_text('NEW HIGH SCORE!', 22, s.RED, s.WIDTH / 2, s.HEIGHT - 40)
 
         pygame.display.update()
         self.wait_for_key()
@@ -386,6 +398,24 @@ class CoronaBreakout:
         # if escape key is pressed, game resumes
         self.wait_for_key(pygame.K_ESCAPE)
         self.paused = False
+
+    def show_mission_screen(self):
+        """Mission screen.
+
+        Shows the aim and main mission of the game.
+        """
+
+        self.screen.fill(s.BLACK)
+
+        self.draw_text('MISSION SCREEN', 40, s.WHITE, s.WIDTH * 0.5, s.HEIGHT * 0.2)
+
+        self.draw_text(f'Collect at least {s.VAC_COLLECT} vaccines.', 30, s.WHITE, s.WIDTH * 0.5, s.HEIGHT * 0.4)
+        self.draw_text(f'Kill a minimum of {s.ENEMY_KILLS} enemies.', 30, s.WHITE, s.WIDTH * 0.5, s.HEIGHT * 0.5)
+
+        self.draw_text('Press ENTER to play...', 30, s.WHITE, s.WIDTH * 0.5, s.HEIGHT * 0.7)
+
+        pygame.display.update()
+        self.wait_for_key(pygame.K_RETURN)
 
     def wait_for_key(self, key=None):
         """Wait for a key press.

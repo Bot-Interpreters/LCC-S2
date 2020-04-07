@@ -5,6 +5,7 @@ if __name__ == '__main__':
     # initializing an instance of the game.
     game = CoronaBreakout()
     game.show_start_screen()
+    game.show_mission_screen()
 
     while game.running:
         game.new()

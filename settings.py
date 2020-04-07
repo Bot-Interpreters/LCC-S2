@@ -12,6 +12,9 @@ HS_FILE = 'highscore.txt'
 BASE_HEIGHT = 35
 POWERUP_SPAWN_FREQ = 50
 CLOUD_FREQ = 1
+VAC_COLLECT = 20
+ENEMY_KILLS = 20
+PLAT_CROSS = 50
 
 # player properties
 PLAYER_ACC = 0.6
