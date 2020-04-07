@@ -216,7 +216,7 @@ class CoronaBreakout:
             self.player.lives -= 1
             # is player dead?
             if self.player.lives == 0:
-                self.playing = False
+                self.show_failed_screen()
 
         # bullet - enemy collision check
         be_hits = pygame.sprite.groupcollide(self.enemies, self.bullets, True, True)
@@ -309,6 +309,13 @@ class CoronaBreakout:
             rand_y = s.HEIGHT - 150 - s.BASE_HEIGHT - random.randrange(0, 100, 20)
             Platform(self, rand_x, rand_y)
 
+        # check if gameover
+        if self.platforms_crossed >= s.PLAT_CROSS:
+            if self.enemies_killed >= s.ENEMY_KILLS and self.vaccines_collected >= s.VAC_COLLECT:
+                self.show_completed_screen()
+            else:
+                self.show_failed_screen()
+
     def draw(self):
         """Draw updated objects to the screen.
         """
@@ -318,6 +325,10 @@ class CoronaBreakout:
         # draw all sprites
         self.all_sprites.draw(self.screen)
         self.enemies.draw(self.screen)
+
+        # draw progress bar
+        pygame.draw.rect(self.screen, s.BLACK, (0, s.HEIGHT - 10, 640, 10))
+        pygame.draw.rect(self.screen, s.RED, (0, s.HEIGHT - 10, self.platforms_crossed * 10, 10))
 
         # draw texts
         self.draw_text(f'Score: {self.score}', 22, s.WHITE, s.WIDTH / 2, 15)
@@ -469,7 +480,7 @@ class CoronaBreakout:
         text_rect.midtop = (x, y)
         self.screen.blit(text_surface, text_rect)
 
-    def render_intro_scene(self):
+    def show_intro_scene(self):
         """Renders a comic strip storyboard.
 
         Lets the user know the basic plot of the game.
@@ -480,3 +491,39 @@ class CoronaBreakout:
 
             pygame.display.update()
             self.wait_for_key()
+
+    def show_completed_screen(self):
+        """Renders the last scenes of the game.
+
+        Only if player finishes all missions.
+        """
+
+        self.screen.fill(s.BLACK)
+
+        self.draw_text('CONGRATULATIONS!', 44, s.WHITE, s.WIDTH / 2, s.HEIGHT * 0.2)
+        self.draw_text('You have successfully completed the game!', 30, s.WHITE, s.WIDTH / 2,
+                       s.HEIGHT * 0.4)
+
+        self.draw_text('Press any key to exit...', 22, s.WHITE, s.WIDTH / 2, s.HEIGHT * 0.8)
+
+        pygame.display.update()
+        self.wait_for_key()
+        self.playing = False
+
+    def show_failed_screen(self):
+        """Renders a mission failed screen.
+
+        If player does not complete missions.
+        """
+
+        self.screen.fill(s.BLACK)
+
+        self.draw_text('FAILED!', 44, s.WHITE, s.WIDTH / 2, s.HEIGHT * 0.2)
+        self.draw_text('You have failed to find a cure for the virus.', 30, s.WHITE, s.WIDTH / 2,
+                       s.HEIGHT * 0.4)
+
+        self.draw_text('Press any key to continue...', 22, s.WHITE, s.WIDTH / 2, s.HEIGHT * 0.8)
+
+        pygame.display.update()
+        self.wait_for_key()
+        self.playing = False
