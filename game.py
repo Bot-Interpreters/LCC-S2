@@ -327,15 +327,26 @@ class CoronaBreakout:
         self.enemies.draw(self.screen)
 
         # draw progress bar
-        pygame.draw.rect(self.screen, s.BLACK, (0, s.HEIGHT - 10, 640, 10))
-        pygame.draw.rect(self.screen, s.RED, (0, s.HEIGHT - 10, self.platforms_crossed * 10, 10))
+        pygame.draw.rect(self.screen, s.RED, (0, s.HEIGHT - 10, 640, 10))
+        pygame.draw.rect(self.screen, s.GREEN, (0, s.HEIGHT - 10, self.platforms_crossed * 10, 10))
 
         # draw texts
         self.draw_text(f'Score: {self.score}', 22, s.WHITE, s.WIDTH / 2, 15)
-
         self.draw_text(f'Player lives remaining: {self.player.lives}', 22, s.RED, s.WIDTH * 0.2, 15)
-        self.draw_text(f'Total Vaccines collected: {self.vaccines_collected} / {s.VAC_COLLECT}', 22, s.RED, s.WIDTH * 0.2, 37)
-        self.draw_text(f'Total enemies killed: {self.enemies_killed} / {s.ENEMY_KILLS}', 22, s.RED, s.WIDTH * 0.2, 57)
+
+        # dynamically update color for texts
+        if self.vaccines_collected < s.VAC_COLLECT:
+            vac_color = s.RED
+        else:
+            vac_color = s.GREEN
+
+        if self.enemies_killed < s.ENEMY_KILLS:
+            enem_color = s.RED
+        else:
+            enem_color = s.GREEN
+
+        self.draw_text(f'Total Vaccines collected: {self.vaccines_collected} / {s.VAC_COLLECT}', 22, vac_color, s.WIDTH * 0.2, 37)
+        self.draw_text(f'Total enemies killed: {self.enemies_killed} / {s.ENEMY_KILLS}', 22, enem_color, s.WIDTH * 0.2, 57)
 
         pygame.display.update()
 
