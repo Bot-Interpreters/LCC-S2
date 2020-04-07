@@ -153,6 +153,7 @@ class Player(pygame.sprite.Sprite):
         self.isRight = True
         # self.shooting = False
         # self.hurt = False
+        self.lives = 3
 
         # tracking for animation
         self.current_frame = 0

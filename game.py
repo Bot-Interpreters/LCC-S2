@@ -160,11 +160,15 @@ class CoronaBreakout:
             self.enemy_timer = now
             Slime(self)
 
-        # enemy hit?
+        # player - enemy collision check
         enemy_hits = pygame.sprite.spritecollide(self.player, self.enemies, True, pygame.sprite.collide_mask)
         if enemy_hits:
             self.dead_sound.play()
-            self.playing = False
+            # reduce player lives
+            self.player.lives -= 1
+            # is player dead?
+            if self.player.lives == 0:
+                self.playing = False
 
         # create new bases as player moves
         last_base = self.bases[-1]
@@ -264,6 +268,7 @@ class CoronaBreakout:
 
         # draw texts
         self.draw_text(f'Score: {self.score}', 22, s.WHITE, s.WIDTH / 2, 15)
+        self.draw_text(f'Player lives remaining: {self.player.lives}', 22, s.RED, s.WIDTH / 6, 15)
 
         pygame.display.update()
 
