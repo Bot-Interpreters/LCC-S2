@@ -32,6 +32,7 @@ class CoronaBreakout:
         self.dir = os.path.dirname(__file__)
         self.img_dir = os.path.join(self.dir, 'images')
         self.sound_dir = os.path.join(self.dir, 'sounds')
+        self.comic_dir = os.path.join(self.dir, 'Comic Strips')
 
         # load high score
         try:  # if file exists, load data
@@ -59,6 +60,13 @@ class CoronaBreakout:
         cloud_dir = os.path.join(self.img_dir, 'clouds')
         for i in range(1, 4):
             self.cloud_images.append(pygame.image.load(os.path.join(cloud_dir, f'cloud{i}.png')).convert())
+
+        # load comic strips
+        self.comic_strips = []
+        for i in range(1, 8):
+            image = pygame.image.load(os.path.join(self.comic_dir, f'scene_{i}.png')).convert()
+            image = pygame.transform.scale(image, (s.WIDTH, s.HEIGHT))
+            self.comic_strips.append(image)
 
         # load sounds
         self.jump_sound = pygame.mixer.Sound(os.path.join(self.sound_dir, 'jump.wav'))
@@ -346,9 +354,6 @@ class CoronaBreakout:
         pygame.display.update()
         self.wait_for_key()
 
-        # fadeout music
-        pygame.mixer.music.fadeout(500)
-
     def show_gameover_screen(self):
         """Game over screen.
 
@@ -417,6 +422,9 @@ class CoronaBreakout:
         pygame.display.update()
         self.wait_for_key(pygame.K_RETURN)
 
+        # fadeout music
+        pygame.mixer.music.fadeout(500)
+
     def wait_for_key(self, key=None):
         """Wait for a key press.
 
@@ -460,3 +468,15 @@ class CoronaBreakout:
         text_rect = text_surface.get_rect()
         text_rect.midtop = (x, y)
         self.screen.blit(text_surface, text_rect)
+
+    def render_intro_scene(self):
+        """Renders a comic strip storyboard.
+
+        Lets the user know the basic plot of the game.
+        """
+
+        for image in self.comic_strips:
+            self.screen.blit(image, (0, 0))
+
+            pygame.display.update()
+            self.wait_for_key()
