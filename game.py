@@ -222,11 +222,12 @@ class CoronaBreakout:
 
         now = pygame.time.get_ticks()
 
-        # spawn Slime every 5 secs.
-        if now - self.slime_timer > 5000 + random.choice([-1000, -500, 0, 500, 1000]):
-            if not self.paused:
-                self.slime_timer = now
-                Slime(self)
+        # spawn Slime at level 1 and 2 every 5 secs.
+        if self.level == 1 or self.level == 2:
+            if now - self.slime_timer > 5000 + random.choice([-1000, -500, 0, 500, 1000]):
+                if not self.paused:
+                    self.slime_timer = now
+                    Slime(self)
 
         # spawn bat at level 2 and above every 30 secs.
         if self.level > 1:
@@ -243,22 +244,34 @@ class CoronaBreakout:
             self.bases.pop(0)
 
         # player - enemy collision check
-        enemy_hits = pygame.sprite.spritecollide(self.player, self.enemies, True, pygame.sprite.collide_mask)
-        if enemy_hits:
-            self.dead_sound.play()
-            # reduce player lives
-            self.player.lives -= 1
-            # is player dead?
-            if self.player.lives == 0:
-                self.failed = True
-                self.show_failed_screen()
+        temp_enemy_hits = pygame.sprite.spritecollide(self.player, self.enemies, False)
+        if temp_enemy_hits:
+            enemy_hits = pygame.sprite.spritecollide(self.player, self.enemies, True, pygame.sprite.collide_mask)
+
+        try:
+            if enemy_hits:
+                self.dead_sound.play()
+                # reduce player lives
+                self.player.lives -= 1
+                # is player dead?
+                if self.player.lives == 0:
+                    self.failed = True
+                    self.show_failed_screen()
+        except Exception:
+            pass
 
         # player - virus collision check
-        virus_hits = pygame.sprite.spritecollide(self.player, self.viruses, False)
-        if virus_hits:
-            self.dead_sound.play()
-            self.failed = True
-            self.show_failed_screen()
+        temp_virus_hits = pygame.sprite.spritecollide(self.player, self.viruses, False)
+        if temp_virus_hits:
+            virus_hits = pygame.sprite.spritecollide(self.player, self.viruses, True, pygame.sprite.collide_mask)
+
+        try:
+            if virus_hits:
+                self.dead_sound.play()
+                self.failed = True
+                self.show_failed_screen()
+        except Exception:
+            pass
 
         # bullet - enemy collision check
         be_hits = pygame.sprite.groupcollide(self.enemies, self.bullets, True, True)
@@ -267,7 +280,7 @@ class CoronaBreakout:
             self.score += 20
             self.enemies_killed += 1
 
-        # bullet - platform collision check
+        # bullet - platform collision check, if so, bullet sprite will be killed
         pygame.sprite.groupcollide(self.bullets, self.platforms, True, False)
 
         # player - base collision check
@@ -374,12 +387,16 @@ class CoronaBreakout:
         self.viruses.draw(self.screen)
 
         # draw progress bar
+        self.draw_text('Level Progress', 15, s.BLACK, 5, s.HEIGHT - s.BASE_HEIGHT, pos='top-left')
         pygame.draw.rect(self.screen, s.RED, (0, s.HEIGHT - 10, s.WIDTH, 10))
         pygame.draw.rect(self.screen, s.GREEN, (0, s.HEIGHT - 10, self.platforms_crossed * 10, 10))
 
-        # draw texts
-        self.draw_text(f'Score: {self.score}', 22, s.WHITE, s.WIDTH / 2, 15)
-        self.draw_text(f'Player lives remaining: {self.player.lives}', 22, s.RED, s.WIDTH * 0.2, 15)
+        # draw game info
+        self.draw_text(f'Level: {self.level}', 22, s.WHITE, s.WIDTH / 2, 20)
+
+        self.draw_text(f'Player lives remaining: {self.player.lives}', 22, s.RED, 5, 15, pos='top-left')
+
+        self.draw_text(f'Score: {self.score}', 22, s.GREEN, 10, 20, pos='top-right')
 
         # dynamically update color for texts
         if self.vaccines_collected < s.VAC_COLLECT:
@@ -392,8 +409,8 @@ class CoronaBreakout:
         else:
             enem_color = s.GREEN
 
-        self.draw_text(f'Total Vaccines collected: {self.vaccines_collected} / {s.VAC_COLLECT}', 22, vac_color, s.WIDTH * 0.2, 37)
-        self.draw_text(f'Total enemies killed: {self.enemies_killed} / {s.ENEMY_KILLS}', 22, enem_color, s.WIDTH * 0.2, 57)
+        self.draw_text(f'Total Vaccines collected: {self.vaccines_collected} / {s.VAC_COLLECT}', 22, vac_color, 5, 45, pos='top-left')
+        self.draw_text(f'Total enemies killed: {self.enemies_killed} / {s.ENEMY_KILLS}', 22, enem_color, 5, 75, pos='top-left')
 
         pygame.display.update()
 
@@ -421,7 +438,7 @@ class CoronaBreakout:
                        s.WIDTH * 0.5, s.HEIGHT * 0.8)
 
         pygame.display.update()
-        self.wait_for_key()
+        self.wait_for_key(pygame.K_RETURN)
 
     def show_gameover_screen(self):
         """Game over screen.
@@ -455,7 +472,7 @@ class CoronaBreakout:
             self.draw_text('NEW HIGH SCORE!', 22, s.RED, s.WIDTH / 2, s.HEIGHT * 0.9)
 
         pygame.display.update()
-        self.wait_for_key()
+        self.wait_for_key(pygame.K_RETURN)
 
         # fadeout music
         pygame.mixer.music.fadeout(500)
@@ -527,7 +544,7 @@ class CoronaBreakout:
                     elif event.key == key:
                         waiting = False
 
-    def draw_text(self, text, size, color, x, y):
+    def draw_text(self, text, size, color, x, y, pos='center'):
         """Draws text to screen.
 
         Args:
@@ -536,13 +553,26 @@ class CoronaBreakout:
             color (tuple): Color of the text.
             x (int): x coordinate of the text.
             y (int): y coordinate of the text.
+            pos (str): Position of the text, for alignment. Defaults to center.
+                Can be of either 'center', 'top-left', 'top-right'
         """
 
         font = pygame.font.Font(self.font_name, size)
         text_surface = font.render(text, True, color)  # antialiasing
         text_rect = text_surface.get_rect()
-        text_rect.centerx = x
-        text_rect.centery = y
+
+        if pos == 'center':
+            text_rect.centerx = x
+            text_rect.centery = y
+
+        elif pos == 'top-left':
+            text_rect.left = x
+            text_rect.top = y
+
+        elif pos == 'top-right':
+            text_rect.top = y
+            text_rect.right = s.WIDTH - x
+
         self.screen.blit(text_surface, text_rect)
 
     def show_intro_scene(self):
@@ -584,7 +614,7 @@ class CoronaBreakout:
         # self.draw_text('Press any key to exit...', 22, s.WHITE, s.WIDTH / 2, s.HEIGHT * 0.8)
 
         pygame.display.update()
-        self.wait_for_key()
+        self.wait_for_key(pygame.K_RETURN)
         self.playing = False
 
     def show_failed_screen(self):
@@ -596,7 +626,7 @@ class CoronaBreakout:
         self.screen.blit(self.mis_failed_image, (0, 0))
 
         pygame.display.update()
-        self.wait_for_key()
+        self.wait_for_key(pygame.K_RETURN)
         self.playing = False
 
     def show_level_intro(self, level):
@@ -618,4 +648,4 @@ class CoronaBreakout:
         self.draw_text('Press ENTER to continue...', 22, s.WHITE, s.WIDTH / 2, s.HEIGHT * 3 / 4)
 
         pygame.display.update()
-        self.wait_for_key()
+        self.wait_for_key(pygame.K_RETURN)
