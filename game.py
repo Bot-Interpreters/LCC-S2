@@ -533,7 +533,7 @@ class CoronaBreakout:
             self.screen.blit(image, (0, 0))
 
             pygame.display.update()
-            self.wait_for_key()
+            self.wait_for_key(pygame.K_RETURN)
 
     def show_completed_screen(self):
         """Renders the last scenes of the game.
