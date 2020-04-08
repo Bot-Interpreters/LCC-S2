@@ -61,6 +61,18 @@ class CoronaBreakout:
         image = pygame.image.load(os.path.join(self.img_dir, 'pausescreen.jpg')).convert()
         self.pause_image = pygame.transform.scale(image, (s.WIDTH, s.HEIGHT))
 
+        # load mission screen image
+        image = pygame.image.load(os.path.join(self.img_dir, 'mis_screen.jpg')).convert()
+        self.mis_image = pygame.transform.scale(image, (s.WIDTH, s.HEIGHT))
+
+        # load mission failed image
+        image = pygame.image.load(os.path.join(self.img_dir, 'mis_failed.jpg')).convert()
+        self.mis_failed_image = pygame.transform.scale(image, (s.WIDTH, s.HEIGHT))
+
+        # load mission completed image
+        image = pygame.image.load(os.path.join(self.img_dir, 'mis_success.jpg')).convert()
+        self.mis_completed_img = pygame.transform.scale(image, (s.WIDTH, s.HEIGHT))
+
         # load cloud images
         self.cloud_images = []
         cloud_dir = os.path.join(self.img_dir, 'clouds')
@@ -385,7 +397,7 @@ class CoronaBreakout:
         pygame.mixer.music.load(os.path.join(self.sound_dir, "start_screen.ogg"))
         pygame.mixer.music.play(loops=-1)
 
-        ss_image = pygame.image.load(os.path.join(self.img_dir, 'startscreen.jpeg')).convert()
+        ss_image = pygame.image.load(os.path.join(self.img_dir, 'startscreen.jpg')).convert()
         ss_image = pygame.transform.scale(ss_image, (s.WIDTH, s.HEIGHT))
 
         self.screen.blit(ss_image, (0, 0))
@@ -396,8 +408,8 @@ class CoronaBreakout:
                        s.WIDTH / 2, s.HEIGHT * 0.5)
         self.draw_text('Press any key to play', 22, s.WHITE,
                        s.WIDTH / 2, s.HEIGHT * 0.6)"""
-        self.draw_text(str(self.highscore), 22, s.WHITE,
-                       s.WIDTH * 0.61, s.HEIGHT * 0.705)
+        self.draw_text(f'HIGH SCORE: {self.highscore}', 22, s.WHITE,
+                       s.WIDTH * 0.5, s.HEIGHT * 0.8)
 
         pygame.display.update()
         self.wait_for_key()
@@ -421,8 +433,7 @@ class CoronaBreakout:
         self.screen.blit(go_image, (0, 0))
 
         # self.draw_text("GAME OVER", 48, s.WHITE, s.WIDTH / 2, s.HEIGHT / 4)
-        self.draw_text(str(self.score), 35, s.RED,
-                       s.WIDTH * 0.63, s.HEIGHT * 0.82)
+        self.draw_text(f'SCORE: {self.score}', 22, s.RED, s.WIDTH / 2, s.HEIGHT * 0.8)
         # self.draw_text('Press a key to play again', 22, s.WHITE,
         #                s.WIDTH / 2, s.HEIGHT * 3 / 4)
 
@@ -432,7 +443,7 @@ class CoronaBreakout:
             with open(os.path.join(self.dir, s.HS_FILE), 'w') as f:
                 f.write(str(self.score))
 
-            self.draw_text('NEW HIGH SCORE!', 22, s.RED, s.WIDTH / 2, s.HEIGHT - 40)
+            self.draw_text('NEW HIGH SCORE!', 22, s.RED, s.WIDTH / 2, s.HEIGHT * 0.9)
 
         pygame.display.update()
         self.wait_for_key()
@@ -464,14 +475,14 @@ class CoronaBreakout:
         if not self.running:
             return None
 
-        self.screen.fill(s.BLACK)
+        self.screen.blit(self.mis_image, (0, 0))
 
-        self.draw_text('MISSION SCREEN', 40, s.WHITE, s.WIDTH * 0.5, s.HEIGHT * 0.2)
+        # self.draw_text('MISSION SCREEN', 40, s.WHITE, s.WIDTH * 0.5, s.HEIGHT * 0.2)
 
         self.draw_text(f'Collect at least {s.VAC_COLLECT} vaccines.', 30, s.WHITE, s.WIDTH * 0.5, s.HEIGHT * 0.4)
         self.draw_text(f'Kill a minimum of {s.ENEMY_KILLS} enemies.', 30, s.WHITE, s.WIDTH * 0.5, s.HEIGHT * 0.5)
 
-        self.draw_text('Press ENTER to play...', 30, s.WHITE, s.WIDTH * 0.5, s.HEIGHT * 0.7)
+        # self.draw_text('Press ENTER to play...', 30, s.WHITE, s.WIDTH * 0.5, s.HEIGHT * 0.7)
 
         pygame.display.update()
         self.wait_for_key(pygame.K_RETURN)
@@ -521,7 +532,8 @@ class CoronaBreakout:
         font = pygame.font.Font(self.font_name, size)
         text_surface = font.render(text, True, color)  # antialiasing
         text_rect = text_surface.get_rect()
-        text_rect.midtop = (x, y)
+        text_rect.centerx = x
+        text_rect.centery = y
         self.screen.blit(text_surface, text_rect)
 
     def show_intro_scene(self):
@@ -554,13 +566,13 @@ class CoronaBreakout:
             pygame.display.update()
             self.wait_for_key(pygame.K_RETURN)
 
-        self.screen.fill(s.BLACK)
+        self.screen.blit(self.mis_completed_img, (0, 0))
 
-        self.draw_text('CONGRATULATIONS!', 44, s.WHITE, s.WIDTH / 2, s.HEIGHT * 0.2)
-        self.draw_text('You have successfully completed the game!', 30, s.WHITE, s.WIDTH / 2,
-                       s.HEIGHT * 0.4)
+        # self.draw_text('CONGRATULATIONS!', 44, s.WHITE, s.WIDTH / 2, s.HEIGHT * 0.2)
+        # self.draw_text('You have successfully completed the game!', 30, s.WHITE, s.WIDTH / 2,
+        #                s.HEIGHT * 0.4)
 
-        self.draw_text('Press any key to exit...', 22, s.WHITE, s.WIDTH / 2, s.HEIGHT * 0.8)
+        # self.draw_text('Press any key to exit...', 22, s.WHITE, s.WIDTH / 2, s.HEIGHT * 0.8)
 
         pygame.display.update()
         self.wait_for_key()
@@ -572,13 +584,7 @@ class CoronaBreakout:
         If player does not complete missions.
         """
 
-        self.screen.fill(s.BLACK)
-
-        self.draw_text('FAILED!', 44, s.WHITE, s.WIDTH / 2, s.HEIGHT * 0.2)
-        self.draw_text('You have failed to find a cure for the virus.', 30, s.WHITE, s.WIDTH / 2,
-                       s.HEIGHT * 0.4)
-
-        self.draw_text('Press any key to continue...', 22, s.WHITE, s.WIDTH / 2, s.HEIGHT * 0.8)
+        self.screen.blit(self.mis_failed_image, (0, 0))
 
         pygame.display.update()
         self.wait_for_key()
