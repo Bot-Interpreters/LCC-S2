@@ -121,6 +121,10 @@ class CoronaBreakout:
         # load bg image
         self.bg_image = BackGround(self)
 
+        if self.level > 2:  # needed for scrolling background
+            self.bg_image_2 = BackGround(self)
+            self.bg_image_2.rect.left = self.bg_image.rect.right
+
         # create new instance of player
         self.player = Player(self)
 
@@ -141,9 +145,10 @@ class CoronaBreakout:
             Platform(self, *plat)
 
         # create clouds/other images
-        for i in range(5):
-            c = Cloud(self)
-            c.rect.x -= random.randrange(200, 400, 50)
+        if self.level < 3:
+            for i in range(5):
+                c = Cloud(self)
+                c.rect.x -= random.randrange(200, 400, 50)
 
         # load music
         pygame.mixer.music.load(os.path.join(self.sound_dir, "background.ogg"))
@@ -222,16 +227,23 @@ class CoronaBreakout:
 
         now = pygame.time.get_ticks()
 
-        # spawn Slime at level 1 and 2 every 5 secs.
-        if self.level == 1 or self.level == 2:
+        # spawn Slime at level 1, 2, and 3 every 5 secs.
+        if self.level <= 3:
             if now - self.slime_timer > 5000 + random.choice([-1000, -500, 0, 500, 1000]):
                 if not self.paused:
                     self.slime_timer = now
                     Slime(self)
 
         # spawn bat at level 2 and above every 30 secs.
-        if self.level > 1:
+        if self.level == 2:
             if now - self.bat_timer > 30000 + random.choice([-1000, -500, 0, 500, 1000]):
+                if not self.paused:
+                    self.bat_timer = now
+                    Bat(self)
+
+        # spawn bat at level 3 and above every 10 secs.
+        if self.level == 3:
+            if now - self.bat_timer > 10000 + random.choice([-1000, -500, 0, 500, 1000]):
                 if not self.paused:
                     self.bat_timer = now
                     Bat(self)
@@ -332,8 +344,9 @@ class CoronaBreakout:
         # moving screen towards right
         if self.player.rect.right >= s.WIDTH * 0.45:
             # creating new clouds
-            if random.randrange(100) < s.CLOUD_FREQ:
-                Cloud(self)
+            if self.level < 3:
+                if random.randrange(100) < s.CLOUD_FREQ:
+                    Cloud(self)
             if self.player.vel.x > 0:
                 # updating player
                 self.player.pos.x -= max(self.player.vel.x, 3)
@@ -353,6 +366,15 @@ class CoronaBreakout:
                 # updating viruses
                 for virus in self.viruses:
                     virus.rect.x -= max(self.player.vel.x, 3)
+                # background
+                if self.level >= 3:
+                    self.bg_image.rect.x -= max(self.player.vel.x / 6, 1)
+
+        # scrolling background
+        if self.level >= 3:
+            self.bg_image_2.rect.left = self.bg_image.rect.right
+            if self.bg_image.rect.right < 0:
+                self.bg_image.rect.left = 0
 
         # spawn new platforms
         # calculate the right pos of previous platform

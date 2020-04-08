@@ -1,4 +1,5 @@
 import pygame
+import settings as s
 from game import CoronaBreakout
 
 if __name__ == '__main__':
@@ -10,7 +11,7 @@ if __name__ == '__main__':
 
     while game.running:
 
-        for i in range(1, 3):
+        for i in range(1, s.GAME_LEVELS + 1):
             game.show_level_intro(level=i)
             game.new()
 
