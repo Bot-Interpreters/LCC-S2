@@ -660,12 +660,10 @@ class CoronaBreakout:
             return None
 
         self.level = level
+        image = pygame.image.load(os.path.join(self.img_dir, f'level{self.level}.jpg')).convert()
+        image = pygame.transform.scale(image, (s.WIDTH, s.HEIGHT))
 
-        self.screen.fill(s.BLACK)
-
-        self.draw_text(f'Level: {self.level}', 30, s.WHITE, s.WIDTH / 2, s.HEIGHT / 2)
-
-        self.draw_text('Press ENTER to continue...', 22, s.WHITE, s.WIDTH / 2, s.HEIGHT * 3 / 4)
+        self.screen.blit(image, (0, 0))
 
         pygame.display.update()
         self.wait_for_key(pygame.K_RETURN)
