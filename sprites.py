@@ -489,6 +489,81 @@ class Slime(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
 
 
+class Bat(pygame.sprite.Sprite):
+
+    def __init__(self, game):
+        """Initialize an enemy bat sprite.
+
+        Args:
+            game (game_instance): Game instance.
+        """
+
+        self.layer = s.ENEMY_LAYER
+        groups = game.all_sprites, game.enemies
+        super(Bat, self).__init__(groups)
+
+        self.game = game
+        self.current_frame = 0
+        self.last_update = 0
+        self.load_images()
+        self.image = self.images[0]
+        self.rect = self.image.get_rect()
+        self.rect.left = s.WIDTH
+        self.rect.top = s.HEIGHT * 0.5
+        self.vx = random.randrange(3, 5)
+        self.vy = 0
+        self.dy = 0.5
+
+    def load_images(self):
+        """Loads images from spritesheet.
+        """
+
+        self.images = [
+            self.game.enemy_spritesheet.get_image(0, 32, 72, 36, scale=1.5),
+            self.game.enemy_spritesheet.get_image(0, 0, 75, 31, scale=1.5),
+        ]
+
+        for image in self.images:
+            image.set_colorkey(s.BLACK)
+
+    def update(self):
+        """Update the sprite.
+
+        Animate, Update position, kill if out of screen.
+        """
+
+        self.animate()
+
+        # moving across screen
+        self.rect.x -= self.vx
+
+        # moving up and down
+        self.vy += self.dy
+
+        # change direction of displacement
+        if self.vy > 3 or self.vy < -3:
+            self.dy *= -1
+
+        # move up or down
+        self.rect.y += self.vy
+
+        if self.rect.right < 0:
+            self.kill()
+
+    def animate(self):
+        """Handles sprite animation.
+        """
+
+        now = pygame.time.get_ticks()
+
+        if now - self.last_update > 180:
+            self.last_update = now
+            self.current_frame = (self.current_frame + 1) % len(self.images)
+            self.image = self.images[self.current_frame]
+
+        self.mask = pygame.mask.from_surface(self.image)
+
+
 class Vaccine(pygame.sprite.Sprite):
     """A vaccine sprite that boosts score.
     """

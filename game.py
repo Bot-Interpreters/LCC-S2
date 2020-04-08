@@ -2,7 +2,7 @@ import os
 import pygame
 import random
 import settings as s
-from sprites import SpriteSheet, Platform, Player, Base, Cloud, Slime, BackGround, Bullet
+from sprites import SpriteSheet, Platform, Player, Base, Cloud, Slime, BackGround, Bullet, Bat
 
 
 class CoronaBreakout:
@@ -99,7 +99,10 @@ class CoronaBreakout:
 
         # create new instance of player
         self.player = Player(self)
-        self.enemy_timer = 0
+
+        # timer for spawning enemies
+        self.slime_timer = 0
+        self.bat_timer = 0
 
         # creating base
         self.bases = []
@@ -195,11 +198,17 @@ class CoronaBreakout:
 
         now = pygame.time.get_ticks()
 
-        # spawn enemy?
-        if now - self.enemy_timer > 5000 + random.choice([-1000, -500, 0, 500, 1000]):
+        # spawn Slime?
+        if now - self.slime_timer > 5000 + random.choice([-1000, -500, 0, 500, 1000]):
             if not self.paused:
-                self.enemy_timer = now
+                self.slime_timer = now
                 Slime(self)
+
+        # spawn bat?
+        if now - self.bat_timer > 15000 + random.choice([-1000, -500, 0, 500, 1000]):
+            if not self.paused:
+                self.bat_timer = now
+                Bat(self)
 
         # create new bases as player moves
         last_base = self.bases[-1]
@@ -327,7 +336,7 @@ class CoronaBreakout:
         self.enemies.draw(self.screen)
 
         # draw progress bar
-        pygame.draw.rect(self.screen, s.RED, (0, s.HEIGHT - 10, 640, 10))
+        pygame.draw.rect(self.screen, s.RED, (0, s.HEIGHT - 10, s.WIDTH, 10))
         pygame.draw.rect(self.screen, s.GREEN, (0, s.HEIGHT - 10, self.platforms_crossed * 10, 10))
 
         # draw texts
