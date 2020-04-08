@@ -69,7 +69,7 @@ class CoronaBreakout:
 
         # load comic strips
         self.comic_strips = []
-        for i in range(1, 8):
+        for i in range(1, 11):
             image = pygame.image.load(os.path.join(self.comic_dir, f'scene_{i}.png')).convert()
             image = pygame.transform.scale(image, (s.WIDTH, s.HEIGHT))
             self.comic_strips.append(image)
@@ -444,6 +444,9 @@ class CoronaBreakout:
         """Pause screen.
         """
 
+        if not self.running:
+            return None
+
         self.screen.blit(self.pause_image, (0, 0))
         self.draw_text(str(self.score), 33, s.WHITE, s.WIDTH * 0.63, s.HEIGHT * 0.395)
 
@@ -492,6 +495,7 @@ class CoronaBreakout:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     waiting = False
+                    self.playing = False
                     self.running = False
 
                 if event.type == pygame.KEYDOWN:
@@ -541,14 +545,14 @@ class CoronaBreakout:
         Only if player finishes all missions.
         """
 
-        for comic in self.comic_strips[7:]:
+        for image in self.comic_strips[7:]:
             if not self.running:
                 return None
 
-            self.screen.blit(comic, (0, 0))
+            self.screen.blit(image, (0, 0))
 
             pygame.display.update()
-            self.wait_for_key()
+            self.wait_for_key(pygame.K_RETURN)
 
         self.screen.fill(s.BLACK)
 
