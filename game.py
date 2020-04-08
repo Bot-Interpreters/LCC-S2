@@ -205,14 +205,14 @@ class CoronaBreakout:
 
         now = pygame.time.get_ticks()
 
-        # spawn Slime?
+        # spawn Slime every 5 secs.
         if now - self.slime_timer > 5000 + random.choice([-1000, -500, 0, 500, 1000]):
             if not self.paused:
                 self.slime_timer = now
                 Slime(self)
 
-        # spawn bat?
-        if now - self.bat_timer > 15000 + random.choice([-1000, -500, 0, 500, 1000]):
+        # spawn bat every 30 secs.
+        if now - self.bat_timer > 30000 + random.choice([-1000, -500, 0, 500, 1000]):
             if not self.paused:
                 self.bat_timer = now
                 Bat(self)
