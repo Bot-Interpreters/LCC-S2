@@ -505,6 +505,7 @@ class Bat(pygame.sprite.Sprite):
         self.game = game
         self.current_frame = 0
         self.last_update = 0
+        self.spreaded = False
         self.load_images()
         self.image = self.images[0]
         self.rect = self.image.get_rect()
@@ -540,7 +541,7 @@ class Bat(pygame.sprite.Sprite):
         # moving up and down
         self.vy += self.dy
 
-        # change direction of displacement
+        # change direction of y displacement
         if self.vy > 3 or self.vy < -3:
             self.dy *= -1
 
@@ -549,6 +550,10 @@ class Bat(pygame.sprite.Sprite):
 
         if self.rect.right < 0:
             self.kill()
+
+        if not self.spreaded and self.rect.centerx < s.WIDTH * 0.9:
+            Virus(self.game, self)
+            self.spreaded = True
 
     def animate(self):
         """Handles sprite animation.
@@ -562,6 +567,64 @@ class Bat(pygame.sprite.Sprite):
             self.image = self.images[self.current_frame]
 
         self.mask = pygame.mask.from_surface(self.image)
+
+
+class Virus(pygame.sprite.Sprite):
+    """Virus that infects player.
+
+    Player loses one life, plus becomes hurt??
+    """
+
+    def __init__(self, game, bat):
+        """Initializing a virus sprite.
+
+        Spawned by a bat sprite.
+
+        Args:
+            game (game_instance): Game Instance.
+            bat (Bat): Bat enemy instance.
+        """
+
+        self.layer = s.ENEMY_LAYER
+        groups = game.all_sprites, game.viruses
+        super(Virus, self).__init__(groups)
+
+        self.bat = bat
+        self.game = game
+        self.image = self.game.virus_image
+        self.mask = pygame.mask.from_surface(self.image)
+        self.rect = self.image.get_rect()
+        self.rect.top = self.bat.rect.bottom
+        self.rect.centerx = self.bat.rect.centerx
+        self.vy = 1
+        self.vx = 0
+        self.dx = 0.1
+
+    def update(self):
+        """Update position of the virus.
+
+        Randomly scatter over the screen.
+        """
+
+        # make the virus fall down
+        self.rect.y += self.vy
+
+        # move left and right
+        self.vx += self.dx
+
+        # change direction of x displacement
+        if self.vx > 3 or self.vx < -3:
+            self.dx *= -1
+
+        # move left or right
+        self.rect.x += self.vx
+
+        if self.rect.bottom > s.HEIGHT - s.BASE_HEIGHT:
+            self.vy = 0
+
+        # kill virus if untouched
+        if self.rect.right < 0:
+            self.kill()
 
 
 class Vaccine(pygame.sprite.Sprite):

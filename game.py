@@ -51,6 +51,12 @@ class CoronaBreakout:
         # load base image
         self.base_img = pygame.image.load(os.path.join(self.img_dir, 'grassCenter.png')).convert()
 
+        # load virus image
+        virus_image = pygame.image.load(os.path.join(self.img_dir, 'coronavirus.png')).convert()
+        rect = virus_image.get_rect()
+        self.virus_image = pygame.transform.scale(virus_image, (rect.width * 2, rect.height * 2))
+        self.virus_image.set_colorkey(s.BLACK)
+
         # load pause screen image
         image = pygame.image.load(os.path.join(self.img_dir, 'pausescreen.jpg')).convert()
         self.pause_image = pygame.transform.scale(image, (s.WIDTH, s.HEIGHT))
@@ -91,6 +97,7 @@ class CoronaBreakout:
         self.platforms = pygame.sprite.Group()
         self.powerups = pygame.sprite.Group()
         self.enemies = pygame.sprite.Group()
+        self.viruses = pygame.sprite.Group()
         self.bullets = pygame.sprite.Group()
         self.clouds = pygame.sprite.Group()
 
@@ -227,6 +234,12 @@ class CoronaBreakout:
             if self.player.lives == 0:
                 self.show_failed_screen()
 
+        # player - virus collision check
+        virus_hits = pygame.sprite.spritecollide(self.player, self.viruses, False)
+        if virus_hits:
+            self.dead_sound.play()
+            self.show_failed_screen()
+
         # bullet - enemy collision check
         be_hits = pygame.sprite.groupcollide(self.enemies, self.bullets, True, True)
         if be_hits:
@@ -304,6 +317,9 @@ class CoronaBreakout:
                 # updating enemies
                 for enemy in self.enemies:
                     enemy.rect.x -= max(self.player.vel.x, 3)
+                # updating viruses
+                for virus in self.viruses:
+                    virus.rect.x -= max(self.player.vel.x, 3)
 
         # spawn new platforms
         # calculate the right pos of previous platform
@@ -334,6 +350,7 @@ class CoronaBreakout:
         # draw all sprites
         self.all_sprites.draw(self.screen)
         self.enemies.draw(self.screen)
+        self.viruses.draw(self.screen)
 
         # draw progress bar
         pygame.draw.rect(self.screen, s.RED, (0, s.HEIGHT - 10, s.WIDTH, 10))
@@ -441,6 +458,9 @@ class CoronaBreakout:
         Shows the aim and main mission of the game.
         """
 
+        if not self.running:
+            return None
+
         self.screen.fill(s.BLACK)
 
         self.draw_text('MISSION SCREEN', 40, s.WHITE, s.WIDTH * 0.5, s.HEIGHT * 0.2)
@@ -507,6 +527,9 @@ class CoronaBreakout:
         """
 
         for image in self.comic_strips:
+            if not self.running:
+                return None
+
             self.screen.blit(image, (0, 0))
 
             pygame.display.update()
