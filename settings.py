@@ -15,7 +15,7 @@ CLOUD_FREQ = 1
 VAC_COLLECT = 20
 ENEMY_KILLS = 20
 PLAT_CROSS = WIDTH / 10
-GAME_LEVELS = 3
+GAME_LEVELS = 4
 
 # player properties
 PLAYER_ACC = 0.6
@@ -45,6 +45,7 @@ BULLET_LAYER = 3
 
 # spritesheets
 ENEMY_SPRITESHEET = os.path.join('enemy', 'enemies_spritesheet.png')
+BAC_SPRITESHEET = os.path.join('enemy', 'bacteria_spritesheet.png')
 HUD_SPRITESHEET = os.path.join('hud', 'hud_spritesheet.png')
 EXPL_SPRITESHEET = os.path.join('explosions', 'explosions_spritesheet.png')
 PLAT_SPRITESHEET = os.path.join('platforms', 'platforms_spritesheet.png')

@@ -426,11 +426,12 @@ class Bullet(pygame.sprite.Sprite):
 
 class Slime(pygame.sprite.Sprite):
 
-    def __init__(self, game):
+    def __init__(self, game, bacteria=False):
         """Initialize an enemy sprite.
 
         Args:
             game (game_instance): Game instance.
+            bacteria (bool): Whether to render images of bacteria
         """
 
         self.layer = s.ENEMY_LAYER
@@ -438,6 +439,7 @@ class Slime(pygame.sprite.Sprite):
         super(Slime, self).__init__(groups)
 
         self.game = game
+        self.bacteria = bacteria
         self.current_frame = 0
         self.last_update = 0
         self.load_images()
@@ -451,16 +453,30 @@ class Slime(pygame.sprite.Sprite):
         """Loads images from spritesheet.
         """
 
-        self.walk_images = [
-            self.game.enemy_spritesheet.get_image(52, 125, 50, 28, scale=1.5),
-            self.game.enemy_spritesheet.get_image(0, 125, 51, 26, scale=1.5)
-        ]
+        if not self.bacteria:
+            self.walk_images = [
+                self.game.enemy_spritesheet.get_image(52, 125, 50, 28, scale=1.5),
+                self.game.enemy_spritesheet.get_image(0, 125, 51, 26, scale=1.5)
+            ]
+
+        elif self.bacteria:
+            self.walk_images = [
+                self.game.bac_spritesheet.get_image(0, 0, 32, 31, scale=1.5),
+                self.game.bac_spritesheet.get_image(32, 0, 32, 31, scale=1.5),
+                self.game.bac_spritesheet.get_image(64, 0, 32, 31, scale=1.5),
+                self.game.bac_spritesheet.get_image(0, 31, 32, 31, scale=1.5),
+                self.game.bac_spritesheet.get_image(32, 31, 32, 31, scale=1.5),
+                self.game.bac_spritesheet.get_image(64, 31, 32, 31, scale=1.5),
+                self.game.bac_spritesheet.get_image(0, 62, 32, 31, scale=1.5),
+                self.game.bac_spritesheet.get_image(32, 62, 32, 31, scale=1.5),
+                self.game.bac_spritesheet.get_image(64, 62, 32, 31, scale=1.5),
+                self.game.bac_spritesheet.get_image(0, 93, 32, 31, scale=1.5),
+                self.game.bac_spritesheet.get_image(32, 93, 32, 31, scale=1.5),
+                self.game.bac_spritesheet.get_image(64, 93, 32, 31, scale=1.5),
+            ]
 
         for frame in self.walk_images:
             frame.set_colorkey(s.BLACK)
-
-        self.die_image = self.game.enemy_spritesheet.get_image(0, 112, 59, 12)
-        self.die_image.set_colorkey(s.BLACK)
 
     def update(self):
         """Update the sprite.
@@ -491,11 +507,12 @@ class Slime(pygame.sprite.Sprite):
 
 class Bat(pygame.sprite.Sprite):
 
-    def __init__(self, game):
+    def __init__(self, game, boss=False):
         """Initialize an enemy bat sprite.
 
         Args:
             game (game_instance): Game instance.
+            boss (bool): whether to spawn a boss Bat.
         """
 
         self.layer = s.ENEMY_LAYER
@@ -503,6 +520,7 @@ class Bat(pygame.sprite.Sprite):
         super(Bat, self).__init__(groups)
 
         self.game = game
+        self.boss = boss
         self.current_frame = 0
         self.last_update = 0
         self.spreaded = False
@@ -519,10 +537,17 @@ class Bat(pygame.sprite.Sprite):
         """Loads images from spritesheet.
         """
 
-        self.images = [
-            self.game.enemy_spritesheet.get_image(0, 32, 72, 36, scale=1.5),
-            self.game.enemy_spritesheet.get_image(0, 0, 75, 31, scale=1.5),
-        ]
+        if not self.boss:
+            self.images = [
+                self.game.enemy_spritesheet.get_image(0, 32, 72, 36, scale=1.5),
+                self.game.enemy_spritesheet.get_image(0, 0, 75, 31, scale=1.5),
+            ]
+
+        elif self.boss:
+            self.images = [
+                self.game.enemy_spritesheet.get_image(0, 32, 72, 36, scale=2),
+                self.game.enemy_spritesheet.get_image(0, 0, 75, 31, scale=2),
+            ]
 
         for image in self.images:
             image.set_colorkey(s.BLACK)
@@ -552,7 +577,7 @@ class Bat(pygame.sprite.Sprite):
             self.kill()
 
         if not self.spreaded and self.rect.centerx < s.WIDTH * 0.9:
-            Virus(self.game, self)
+            Virus(self.game, self, self.boss)
             self.spreaded = True
 
     def animate(self):
@@ -575,7 +600,7 @@ class Virus(pygame.sprite.Sprite):
     Player loses one life, plus becomes hurt??
     """
 
-    def __init__(self, game, bat):
+    def __init__(self, game, bat, boss=False):
         """Initializing a virus sprite.
 
         Spawned by a bat sprite.
@@ -583,6 +608,7 @@ class Virus(pygame.sprite.Sprite):
         Args:
             game (game_instance): Game Instance.
             bat (Bat): Bat enemy instance.
+            boss (bool): Whether to spawn boss virus.
         """
 
         self.layer = s.ENEMY_LAYER
@@ -592,8 +618,10 @@ class Virus(pygame.sprite.Sprite):
         self.bat = bat
         self.game = game
         self.image = self.game.virus_image
-        self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
+        if boss:
+            self.image = pygame.transform.scale(self.image, (self.rect.width * 2, self.rect.height * 2))
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect.top = self.bat.rect.bottom
         self.rect.centerx = self.bat.rect.centerx
         self.vy = 1
@@ -698,7 +726,7 @@ class BackGround(pygame.sprite.Sprite):
 
         bg_dir = os.path.join(self.game.img_dir, 'background')
 
-        if self.game.level == 3:
+        if self.game.level >= 3:
             image = pygame.image.load(os.path.join(bg_dir, 'forest.jpg')).convert()
         else:
             image = pygame.image.load(os.path.join(bg_dir, 'night_city.png')).convert_alpha()

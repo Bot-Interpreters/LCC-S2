@@ -47,6 +47,7 @@ class CoronaBreakout:
         self.hud_spritesheet = SpriteSheet(os.path.join(self.img_dir, s.HUD_SPRITESHEET))
         self.expl_spritesheet = SpriteSheet(os.path.join(self.img_dir, s.EXPL_SPRITESHEET))
         self.plat_spritesheet = SpriteSheet(os.path.join(self.img_dir, s.PLAT_SPRITESHEET))
+        self.bac_spritesheet = SpriteSheet(os.path.join(self.img_dir, s.BAC_SPRITESHEET))
 
         # load base image
         self.base_img = pygame.image.load(os.path.join(self.img_dir, 'grassCenter.png')).convert()
@@ -228,25 +229,22 @@ class CoronaBreakout:
         now = pygame.time.get_ticks()
 
         # spawn Slime at level 1, 2, and 3 every 5 secs.
-        if self.level <= 3:
-            if now - self.slime_timer > 5000 + random.choice([-1000, -500, 0, 500, 1000]):
-                if not self.paused:
-                    self.slime_timer = now
-                    Slime(self)
+        if now - self.slime_timer > 5000 + random.choice([-1000, -500, 0, 500, 1000]):
+            if not self.paused:
+                self.slime_timer = now
+                Slime(self, self.level >= 3)
 
         # spawn bat at level 2 and above every 30 secs.
         if self.level == 2:
-            if now - self.bat_timer > 30000 + random.choice([-1000, -500, 0, 500, 1000]):
-                if not self.paused:
-                    self.bat_timer = now
-                    Bat(self)
+            bat_freq = 30000
+        elif self.level >= 3:
+            bat_freq = 10000
 
-        # spawn bat at level 3 and above every 10 secs.
-        if self.level == 3:
-            if now - self.bat_timer > 10000 + random.choice([-1000, -500, 0, 500, 1000]):
+        if self.level > 1:
+            if now - self.bat_timer > bat_freq + random.choice([-1000, -500, 0, 500, 1000]):
                 if not self.paused:
                     self.bat_timer = now
-                    Bat(self)
+                    Bat(self, self.level == 4)
 
         # create new bases as player moves
         last_base = self.bases[-1]
