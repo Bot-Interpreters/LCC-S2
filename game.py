@@ -96,10 +96,15 @@ class CoronaBreakout:
         """Start a new game.
         """
 
+        if not self.running:
+            return None
+
         # keeping track of missions
         self.score = 0
         self.vaccines_collected = 0
         self.enemies_killed = 0
+
+        self.failed = False
 
         # used for checking if player completed game
         self.platforms_crossed = 0
@@ -223,11 +228,12 @@ class CoronaBreakout:
                 self.slime_timer = now
                 Slime(self)
 
-        # spawn bat every 30 secs.
-        if now - self.bat_timer > 30000 + random.choice([-1000, -500, 0, 500, 1000]):
-            if not self.paused:
-                self.bat_timer = now
-                Bat(self)
+        # spawn bat at level 2 and above every 30 secs.
+        if self.level > 1:
+            if now - self.bat_timer > 30000 + random.choice([-1000, -500, 0, 500, 1000]):
+                if not self.paused:
+                    self.bat_timer = now
+                    Bat(self)
 
         # create new bases as player moves
         last_base = self.bases[-1]
@@ -244,12 +250,14 @@ class CoronaBreakout:
             self.player.lives -= 1
             # is player dead?
             if self.player.lives == 0:
+                self.failed = True
                 self.show_failed_screen()
 
         # player - virus collision check
         virus_hits = pygame.sprite.spritecollide(self.player, self.viruses, False)
         if virus_hits:
             self.dead_sound.play()
+            self.failed = True
             self.show_failed_screen()
 
         # bullet - enemy collision check
@@ -349,8 +357,9 @@ class CoronaBreakout:
         # check if gameover
         if self.platforms_crossed >= s.PLAT_CROSS:
             if self.enemies_killed >= s.ENEMY_KILLS and self.vaccines_collected >= s.VAC_COLLECT:
-                self.show_completed_screen()
+                self.playing = False
             else:
+                self.failed = True
                 self.show_failed_screen()
 
     def draw(self):
@@ -589,3 +598,24 @@ class CoronaBreakout:
         pygame.display.update()
         self.wait_for_key()
         self.playing = False
+
+    def show_level_intro(self, level):
+        """Renders level info image.
+
+        Args:
+            level (int): Level of the game to be played.
+        """
+
+        if not self.running:
+            return None
+
+        self.level = level
+
+        self.screen.fill(s.BLACK)
+
+        self.draw_text(f'Level: {self.level}', 30, s.WHITE, s.WIDTH / 2, s.HEIGHT / 2)
+
+        self.draw_text('Press ENTER to continue...', 22, s.WHITE, s.WIDTH / 2, s.HEIGHT * 3 / 4)
+
+        pygame.display.update()
+        self.wait_for_key()

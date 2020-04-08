@@ -9,7 +9,17 @@ if __name__ == '__main__':
     game.show_mission_screen()
 
     while game.running:
-        game.new()
+
+        for i in range(1, 3):
+            game.show_level_intro(level=i)
+            game.new()
+
+            if game.failed:
+                break
+
+        if not game.failed:
+            game.show_completed_screen()
+
         game.show_gameover_screen()
 
     pygame.quit()
