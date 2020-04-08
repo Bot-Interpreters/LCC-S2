@@ -327,7 +327,7 @@ class CoronaBreakout:
         self.enemies.draw(self.screen)
 
         # draw progress bar
-        pygame.draw.rect(self.screen, s.RED, (0, s.HEIGHT - 10, 640, 10))
+        pygame.draw.rect(self.screen, s.RED, (0, s.HEIGHT - 10, s.WIDTH, 10))
         pygame.draw.rect(self.screen, s.GREEN, (0, s.HEIGHT - 10, self.platforms_crossed * 10, 10))
 
         # draw texts
