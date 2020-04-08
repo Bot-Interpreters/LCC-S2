@@ -526,7 +526,7 @@ class CoronaBreakout:
         Lets the user know the basic plot of the game.
         """
 
-        for image in self.comic_strips:
+        for image in self.comic_strips[:7]:
             if not self.running:
                 return None
 
@@ -540,6 +540,15 @@ class CoronaBreakout:
 
         Only if player finishes all missions.
         """
+
+        for comic in self.comic_strips[7:]:
+            if not self.running:
+                return None
+
+            self.screen.blit(comic, (0, 0))
+
+            pygame.display.update()
+            self.wait_for_key()
 
         self.screen.fill(s.BLACK)
 
