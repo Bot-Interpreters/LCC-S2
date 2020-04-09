@@ -406,7 +406,10 @@ class Bullet(pygame.sprite.Sprite):
         """
 
         # starting image
-        self.image = self.game.expl_spritesheet.get_image(304, 580, 12, 12, scale=1.5)
+        if self.game.level == 4:
+            self.image = self.game.expl_spritesheet.get_image(276, 580, 12, 12, scale=1.5)
+        else:
+            self.image = self.game.expl_spritesheet.get_image(304, 580, 12, 12, scale=1.5)
 
     def update(self):
 
