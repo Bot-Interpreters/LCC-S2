@@ -1,4 +1,5 @@
 import os
+import sys
 import pygame
 import random
 import settings as s
@@ -97,9 +98,6 @@ class CoronaBreakout:
         """Start a new game.
         """
 
-        if not self.running:
-            return None
-
         # keeping track of missions
         self.score = 0
         self.vaccines_collected = 0
@@ -181,9 +179,8 @@ class CoronaBreakout:
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                if self.playing:
-                    self.playing = False  # back to start screen
-                self.running = False  # closes the whole game
+                pygame.quit()
+                sys.exit(0)
 
             # escape key to pause
             if event.type == pygame.KEYDOWN:
@@ -472,9 +469,6 @@ class CoronaBreakout:
         Renders user's score and highscore.
         """
 
-        if not self.running:
-            return None
-
         # load music
         pygame.mixer.music.load(os.path.join(self.sound_dir, "game_over.ogg"))
         pygame.mixer.music.play(loops=-1)
@@ -507,9 +501,6 @@ class CoronaBreakout:
         """Pause screen.
         """
 
-        if not self.running:
-            return None
-
         self.screen.blit(self.pause_image, (0, 0))
         self.draw_text(str(self.score), 33, s.WHITE, s.WIDTH * 0.63, s.HEIGHT * 0.395)
 
@@ -523,9 +514,6 @@ class CoronaBreakout:
 
         Shows the aim and main mission of the game.
         """
-
-        if not self.running:
-            return None
 
         self.screen.blit(self.mis_image, (0, 0))
 
@@ -557,9 +545,8 @@ class CoronaBreakout:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    waiting = False
-                    self.playing = False
-                    self.running = False
+                    pygame.quit()
+                    sys.exit(0)
 
                 if event.type == pygame.KEYDOWN:
                     pressed = True
@@ -569,6 +556,14 @@ class CoronaBreakout:
                         waiting = False
                     elif event.key == key:
                         waiting = False
+
+                    # to exit the game loop completely
+                    elif event.key == pygame.K_q and pressed:
+                        waiting = False
+                        self.playing = False
+                        self.running = False
+                        pygame.quit()
+                        sys.exit(0)
 
     def draw_text(self, text, size, color, x, y, pos='center'):
         """Draws text to screen.
@@ -608,8 +603,6 @@ class CoronaBreakout:
         """
 
         for image in self.comic_strips[:7]:
-            if not self.running:
-                return None
 
             self.screen.blit(image, (0, 0))
 
@@ -621,15 +614,6 @@ class CoronaBreakout:
 
         Only if player finishes all missions.
         """
-
-        for image in self.comic_strips[7:]:
-            if not self.running:
-                return None
-
-            self.screen.blit(image, (0, 0))
-
-            pygame.display.update()
-            self.wait_for_key(pygame.K_RETURN)
 
         self.screen.blit(self.mis_completed_img, (0, 0))
 
@@ -662,10 +646,16 @@ class CoronaBreakout:
             level (int): Level of the game to be played.
         """
 
-        if not self.running:
-            return None
-
         self.level = level
+
+        if self.level == 2:
+            for image in self.comic_strips[7:]:
+
+                self.screen.blit(image, (0, 0))
+
+                pygame.display.update()
+                self.wait_for_key(pygame.K_RETURN)
+
         image = pygame.image.load(os.path.join(self.img_dir, f'level{self.level}.jpg')).convert()
         image = pygame.transform.scale(image, (s.WIDTH, s.HEIGHT))
 
