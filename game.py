@@ -122,7 +122,7 @@ class CoronaBreakout:
         # load bg image
         self.bg_image = BackGround(self)
 
-        if self.level > 2:  # needed for scrolling background
+        if self.level > 1:  # needed for scrolling background
             self.bg_image_2 = BackGround(self)
             self.bg_image_2.rect.left = self.bg_image.rect.right
 
@@ -146,7 +146,7 @@ class CoronaBreakout:
             Platform(self, *plat)
 
         # create clouds/other images
-        if self.level < 3:
+        if self.level == 1:
             for i in range(5):
                 c = Cloud(self)
                 c.rect.x -= random.randrange(200, 400, 50)
@@ -191,6 +191,12 @@ class CoronaBreakout:
                 if event.key == pygame.K_UP:
                     if not self.player.jumping:
                         self.player.jump()
+
+                # purely for debugging purposes
+                if event.key == pygame.K_F1:
+                    self.vaccines_collected += 20
+                    self.enemies_killed += 20
+                    self.platforms_crossed = s.PLAT_CROSS - 1
 
                 # player shooting
                 if event.key == pygame.K_SPACE:
@@ -342,7 +348,7 @@ class CoronaBreakout:
         # moving screen towards right
         if self.player.rect.right >= s.WIDTH * 0.45:
             # creating new clouds
-            if self.level < 3:
+            if self.level == 1:
                 if random.randrange(100) < s.CLOUD_FREQ:
                     Cloud(self)
             if self.player.vel.x > 0:
@@ -365,11 +371,11 @@ class CoronaBreakout:
                 for virus in self.viruses:
                     virus.rect.x -= max(self.player.vel.x, 3)
                 # background
-                if self.level >= 3:
+                if self.level >= 2:
                     self.bg_image.rect.x -= max(self.player.vel.x / 6, 1)
 
         # scrolling background
-        if self.level >= 3:
+        if self.level >= 2:
             self.bg_image_2.rect.left = self.bg_image.rect.right
             if self.bg_image.rect.right < 0:
                 self.bg_image.rect.left = 0
