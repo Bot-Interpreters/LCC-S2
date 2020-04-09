@@ -1,4 +1,5 @@
 import os
+import sys
 import pygame
 import random
 import settings as s
@@ -97,9 +98,6 @@ class CoronaBreakout:
         """Start a new game.
         """
 
-        if not self.running:
-            return None
-
         # keeping track of missions
         self.score = 0
         self.vaccines_collected = 0
@@ -122,7 +120,7 @@ class CoronaBreakout:
         # load bg image
         self.bg_image = BackGround(self)
 
-        if self.level > 2:  # needed for scrolling background
+        if self.level > 1:  # needed for scrolling background
             self.bg_image_2 = BackGround(self)
             self.bg_image_2.rect.left = self.bg_image.rect.right
 
@@ -146,7 +144,7 @@ class CoronaBreakout:
             Platform(self, *plat)
 
         # create clouds/other images
-        if self.level < 3:
+        if self.level == 1:
             for i in range(5):
                 c = Cloud(self)
                 c.rect.x -= random.randrange(200, 400, 50)
@@ -181,9 +179,8 @@ class CoronaBreakout:
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                if self.playing:
-                    self.playing = False  # back to start screen
-                self.running = False  # closes the whole game
+                pygame.quit()
+                sys.exit(0)
 
             # escape key to pause
             if event.type == pygame.KEYDOWN:
@@ -191,6 +188,12 @@ class CoronaBreakout:
                 if event.key == pygame.K_UP:
                     if not self.player.jumping:
                         self.player.jump()
+
+                # purely for debugging purposes
+                if event.key == pygame.K_F1:
+                    self.vaccines_collected += 20
+                    self.enemies_killed += 20
+                    self.platforms_crossed = s.PLAT_CROSS - 1
 
                 # player shooting
                 if event.key == pygame.K_SPACE:
@@ -342,7 +345,7 @@ class CoronaBreakout:
         # moving screen towards right
         if self.player.rect.right >= s.WIDTH * 0.45:
             # creating new clouds
-            if self.level < 3:
+            if self.level == 1:
                 if random.randrange(100) < s.CLOUD_FREQ:
                     Cloud(self)
             if self.player.vel.x > 0:
@@ -365,11 +368,11 @@ class CoronaBreakout:
                 for virus in self.viruses:
                     virus.rect.x -= max(self.player.vel.x, 3)
                 # background
-                if self.level >= 3:
+                if self.level >= 2:
                     self.bg_image.rect.x -= max(self.player.vel.x / 6, 1)
 
         # scrolling background
-        if self.level >= 3:
+        if self.level >= 2:
             self.bg_image_2.rect.left = self.bg_image.rect.right
             if self.bg_image.rect.right < 0:
                 self.bg_image.rect.left = 0
@@ -466,9 +469,6 @@ class CoronaBreakout:
         Renders user's score and highscore.
         """
 
-        if not self.running:
-            return None
-
         # load music
         pygame.mixer.music.load(os.path.join(self.sound_dir, "game_over.ogg"))
         pygame.mixer.music.play(loops=-1)
@@ -501,9 +501,6 @@ class CoronaBreakout:
         """Pause screen.
         """
 
-        if not self.running:
-            return None
-
         self.screen.blit(self.pause_image, (0, 0))
         self.draw_text(str(self.score), 33, s.WHITE, s.WIDTH * 0.63, s.HEIGHT * 0.395)
 
@@ -517,9 +514,6 @@ class CoronaBreakout:
 
         Shows the aim and main mission of the game.
         """
-
-        if not self.running:
-            return None
 
         self.screen.blit(self.mis_image, (0, 0))
 
@@ -551,9 +545,8 @@ class CoronaBreakout:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    waiting = False
-                    self.playing = False
-                    self.running = False
+                    pygame.quit()
+                    sys.exit(0)
 
                 if event.type == pygame.KEYDOWN:
                     pressed = True
@@ -563,6 +556,14 @@ class CoronaBreakout:
                         waiting = False
                     elif event.key == key:
                         waiting = False
+
+                    # to exit the game loop completely
+                    elif event.key == pygame.K_q and pressed:
+                        waiting = False
+                        self.playing = False
+                        self.running = False
+                        pygame.quit()
+                        sys.exit(0)
 
     def draw_text(self, text, size, color, x, y, pos='center'):
         """Draws text to screen.
@@ -602,8 +603,6 @@ class CoronaBreakout:
         """
 
         for image in self.comic_strips[:7]:
-            if not self.running:
-                return None
 
             self.screen.blit(image, (0, 0))
 
@@ -615,15 +614,6 @@ class CoronaBreakout:
 
         Only if player finishes all missions.
         """
-
-        for image in self.comic_strips[7:]:
-            if not self.running:
-                return None
-
-            self.screen.blit(image, (0, 0))
-
-            pygame.display.update()
-            self.wait_for_key(pygame.K_RETURN)
 
         self.screen.blit(self.mis_completed_img, (0, 0))
 
@@ -656,10 +646,16 @@ class CoronaBreakout:
             level (int): Level of the game to be played.
         """
 
-        if not self.running:
-            return None
-
         self.level = level
+
+        if self.level == 2:
+            for image in self.comic_strips[7:]:
+
+                self.screen.blit(image, (0, 0))
+
+                pygame.display.update()
+                self.wait_for_key(pygame.K_RETURN)
+
         image = pygame.image.load(os.path.join(self.img_dir, f'level{self.level}.jpg')).convert()
         image = pygame.transform.scale(image, (s.WIDTH, s.HEIGHT))
 

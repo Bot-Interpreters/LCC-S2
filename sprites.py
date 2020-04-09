@@ -726,7 +726,7 @@ class BackGround(pygame.sprite.Sprite):
 
         bg_dir = os.path.join(self.game.img_dir, 'background')
 
-        if self.game.level >= 3:
+        if self.game.level >= 2:
             image = pygame.image.load(os.path.join(bg_dir, 'forest.jpg')).convert()
         else:
             image = pygame.image.load(os.path.join(bg_dir, 'night_city.png')).convert_alpha()
