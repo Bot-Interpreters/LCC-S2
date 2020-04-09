@@ -83,7 +83,7 @@ class CoronaBreakout:
 
         # load comic strips
         self.comic_strips = []
-        for i in range(1, 11):
+        for i in range(1, 14):
             image = pygame.image.load(os.path.join(self.comic_dir, f'scene_{i}.png')).convert()
             image = pygame.transform.scale(image, (s.WIDTH, s.HEIGHT))
             self.comic_strips.append(image)
@@ -649,7 +649,15 @@ class CoronaBreakout:
         self.level = level
 
         if self.level == 2:
-            for image in self.comic_strips[7:]:
+            for image in self.comic_strips[7:10]:
+
+                self.screen.blit(image, (0, 0))
+
+                pygame.display.update()
+                self.wait_for_key(pygame.K_RETURN)
+
+        if self.level == 4:
+            for image in self.comic_strips[10:]:
 
                 self.screen.blit(image, (0, 0))
 
