@@ -664,7 +664,15 @@ class CoronaBreakout:
         self.level = level
 
         if self.level == 2:
-            for image in self.comic_strips[7:10]:
+            for image in self.comic_strips[7:8]:
+
+                self.screen.blit(image, (0, 0))
+
+                pygame.display.update()
+                self.wait_for_key(pygame.K_RETURN)
+
+        if self.level == 3:
+            for image in self.comic_strips[8:10]:
 
                 self.screen.blit(image, (0, 0))
 
