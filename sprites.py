@@ -92,12 +92,20 @@ class Platform(pygame.sprite.Sprite):
         self.game = game
 
         # load a random image
-        images = [
-            self.game.plat_spritesheet.get_image(0, 96, 380, 94),  # stone
-            self.game.plat_spritesheet.get_image(0, 192, 380, 94),  # stone broken
-            self.game.plat_spritesheet.get_image(382, 408, 200, 100),  # stone small
-            self.game.plat_spritesheet.get_image(232, 1288, 200, 100),  # stone small broken
-        ]
+        if self.game.level == 1:
+            images = [
+                self.game.plat_spritesheet.get_image(0, 96, 380, 94),  # stone
+                self.game.plat_spritesheet.get_image(0, 192, 380, 94),  # stone broken
+                self.game.plat_spritesheet.get_image(382, 408, 200, 100),  # stone small
+                self.game.plat_spritesheet.get_image(232, 1288, 200, 100),  # stone small broken
+            ]
+        else:
+            images = [
+                self.game.plat_spritesheet.get_image(0, 960, 380, 94),
+                self.game.plat_spritesheet.get_image(0, 864, 380, 94),
+                self.game.plat_spritesheet.get_image(218, 1558, 200, 100),
+                self.game.plat_spritesheet.get_image(382, 0, 200, 100),
+            ]
 
         self.image = random.choice(images)
 
