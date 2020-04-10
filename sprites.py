@@ -107,8 +107,16 @@ class Platform(pygame.sprite.Sprite):
         self.rect.y = y
 
         # spawn a vaccine on the platform
-        if random.randrange(100) < s.POWERUP_SPAWN_FREQ:
-            Vaccine(self.game, self)
+        random_type = random.choice(['vaccine', 'ammo', 'health'])
+        if random_type == 'vaccine':
+            threshold = 90
+        elif random_type == 'ammo':
+            threshold = 60
+        elif random_type == 'health':
+            threshold = 40
+
+        if random.randrange(100) < threshold:
+            PowerUp(self.game, self, type_=random_type)
 
 
 class Base(pygame.sprite.Sprite):
@@ -151,7 +159,7 @@ class Player(pygame.sprite.Sprite):
         self.running = False
         self.jumping = False
         self.shooting = False
-        self.lives = 3
+        self.lives = 1
 
         # tracking for animation
         self.current_frame = 0
@@ -658,11 +666,11 @@ class Virus(pygame.sprite.Sprite):
             self.kill()
 
 
-class Vaccine(pygame.sprite.Sprite):
-    """A vaccine sprite that boosts score.
+class PowerUp(pygame.sprite.Sprite):
+    """A PowerUp sprite that boosts score.
     """
 
-    def __init__(self, game, plat):
+    def __init__(self, game, plat, type_='vaccine'):
         """Initialize sprite.
 
         We need a platform sprite to spawn the powerup on.
@@ -670,14 +678,16 @@ class Vaccine(pygame.sprite.Sprite):
         Args:
             game (game_instance): Game instance.
             plat (Platform): Platform on which the powerup will spawn.
+            type_ (str): Type of powerup to be spawned.
         """
 
         self._layer = s.POW_LAYER
         groups = game.all_sprites, game.powerups
-        super(Vaccine, self).__init__(groups)
+        super(PowerUp, self).__init__(groups)
 
         self.game = game
         self.plat = plat
+        self.type = type_
         self.load_image()
         self.rect = self.image.get_rect()
         self.rect.centerx = self.plat.rect.centerx
@@ -689,10 +699,16 @@ class Vaccine(pygame.sprite.Sprite):
         Loads, scaled, rotates.
         """
 
-        self.image = pygame.image.load(os.path.join(self.game.img_dir, 'syringe.png')).convert()
-        rect = self.image.get_rect()
-        self.image = pygame.transform.scale(self.image, (int(rect.width * 2), int(rect.height * 2)))
-        self.image = pygame.transform.rotate(self.image, 90)
+        if self.type == 'vaccine':
+            self.image = pygame.image.load(os.path.join(self.game.img_dir, 'syringe.png')).convert()
+            rect = self.image.get_rect()
+            self.image = pygame.transform.scale(self.image, (int(rect.width * 2), int(rect.height * 2)))
+            self.image = pygame.transform.rotate(self.image, 90)
+        elif self.type == 'health':
+            self.image = self.game.hud_spritesheet.get_image(0, 94, 53, 45, scale=0.5).convert()
+        elif self.type == 'ammo':
+            self.image = self.game.plat_spritesheet.get_image(852, 1089, 65, 77, scale=0.5).convert()
+
         self.image.set_colorkey(s.BLACK)
 
     def update(self):

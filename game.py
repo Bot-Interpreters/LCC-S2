@@ -102,6 +102,7 @@ class CoronaBreakout:
         self.score = 0
         self.vaccines_collected = 0
         self.enemies_killed = 0
+        self.n_bullets = 10  # initial number of bullets for the player
 
         self.failed = False
 
@@ -199,11 +200,12 @@ class CoronaBreakout:
                 if event.key == pygame.K_SPACE:
                     # only if not already shooting
                     # prevents spawn of multiple bullets at the same press
-                    if not self.player.shooting:
+                    if not self.player.shooting and self.n_bullets > 0:
                         self.player.shooting = True
                         self.player.idle = False
                         self.bullet_sound.play()
                         Bullet(self)
+                        self.n_bullets -= 1
 
             if event.type == pygame.KEYUP:
                 # keyup space to jump_cut
@@ -312,7 +314,12 @@ class CoronaBreakout:
             self.powerup_sound.play()
             # add points to score
             self.score += 10
-            self.vaccines_collected += 1
+            if powerUp.type == 'vaccine':
+                self.vaccines_collected += 1
+            elif powerUp.type == 'health':
+                self.player.lives += 1
+            elif powerUp.type == 'ammo':
+                self.n_bullets += 1
 
         # player - platform collision check
         temp_plat_hits = pygame.sprite.spritecollide(self.player, self.platforms, False)  # BB check
@@ -420,6 +427,7 @@ class CoronaBreakout:
         self.draw_text(f'Player lives remaining: {self.player.lives}', 22, s.RED, 5, 15, pos='top-left')
 
         self.draw_text(f'Score: {self.score}', 22, s.GREEN, 10, 20, pos='top-right')
+        self.draw_text(f'Bullets: {self.n_bullets}', 22, s.GREEN, 10, 40, pos='top-right')
 
         # dynamically update color for texts
         if self.vaccines_collected < s.VAC_COLLECT:
