@@ -245,6 +245,7 @@ class CoronaBreakout:
         elif self.level >= 3:
             bat_freq = 10000
 
+        # spawn bats only after level 1
         if self.level > 1:
             if now - self.bat_timer > bat_freq + random.choice([-1000, -500, 0, 500, 1000]):
                 if not self.paused:
@@ -459,12 +460,6 @@ class CoronaBreakout:
 
         self.screen.blit(ss_image, (0, 0))
 
-        """self.draw_text(s.TITLE, 48, s.WHITE,
-                       s.WIDTH / 2, s.HEIGHT * 1 / 5)
-        self.draw_text('Arrows to move and jump, space to shoot.', 22, s.WHITE,
-                       s.WIDTH / 2, s.HEIGHT * 0.5)
-        self.draw_text('Press any key to play', 22, s.WHITE,
-                       s.WIDTH / 2, s.HEIGHT * 0.6)"""
         self.draw_text(f'HIGH SCORE: {self.highscore}', 22, s.WHITE,
                        s.WIDTH * 0.5, s.HEIGHT * 0.8)
 
@@ -486,10 +481,7 @@ class CoronaBreakout:
 
         self.screen.blit(go_image, (0, 0))
 
-        # self.draw_text("GAME OVER", 48, s.WHITE, s.WIDTH / 2, s.HEIGHT / 4)
         self.draw_text(f'SCORE: {self.score}', 22, s.RED, s.WIDTH / 2, s.HEIGHT * 0.8)
-        # self.draw_text('Press a key to play again', 22, s.WHITE,
-        #                s.WIDTH / 2, s.HEIGHT * 3 / 4)
 
         if self.score > self.highscore:
             self.highscore = self.score
@@ -525,12 +517,8 @@ class CoronaBreakout:
 
         self.screen.blit(self.mis_image, (0, 0))
 
-        # self.draw_text('MISSION SCREEN', 40, s.WHITE, s.WIDTH * 0.5, s.HEIGHT * 0.2)
-
         self.draw_text(f'Collect at least {s.VAC_COLLECT} vaccines.', 30, s.WHITE, s.WIDTH * 0.5, s.HEIGHT * 0.4)
         self.draw_text(f'Kill a minimum of {s.ENEMY_KILLS} enemies.', 30, s.WHITE, s.WIDTH * 0.5, s.HEIGHT * 0.5)
-
-        # self.draw_text('Press ENTER to play...', 30, s.WHITE, s.WIDTH * 0.5, s.HEIGHT * 0.7)
 
         pygame.display.update()
         self.wait_for_key(pygame.K_RETURN)
@@ -631,12 +619,6 @@ class CoronaBreakout:
             self.wait_for_key(pygame.K_RETURN)
 
         self.screen.blit(self.mis_completed_img, (0, 0))
-
-        # self.draw_text('CONGRATULATIONS!', 44, s.WHITE, s.WIDTH / 2, s.HEIGHT * 0.2)
-        # self.draw_text('You have successfully completed the game!', 30, s.WHITE, s.WIDTH / 2,
-        #                s.HEIGHT * 0.4)
-
-        # self.draw_text('Press any key to exit...', 22, s.WHITE, s.WIDTH / 2, s.HEIGHT * 0.8)
 
         pygame.display.update()
         self.wait_for_key(pygame.K_RETURN)

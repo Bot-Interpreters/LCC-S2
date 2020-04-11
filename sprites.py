@@ -91,13 +91,12 @@ class Platform(pygame.sprite.Sprite):
 
         self.game = game
 
-        # load a random image
         if self.game.level == 1:
             images = [
-                self.game.plat_spritesheet.get_image(0, 96, 380, 94),  # stone
-                self.game.plat_spritesheet.get_image(0, 192, 380, 94),  # stone broken
-                self.game.plat_spritesheet.get_image(382, 408, 200, 100),  # stone small
-                self.game.plat_spritesheet.get_image(232, 1288, 200, 100),  # stone small broken
+                self.game.plat_spritesheet.get_image(0, 96, 380, 94),
+                self.game.plat_spritesheet.get_image(0, 192, 380, 94),
+                self.game.plat_spritesheet.get_image(382, 408, 200, 100),
+                self.game.plat_spritesheet.get_image(232, 1288, 200, 100),
             ]
         else:
             images = [
@@ -107,6 +106,7 @@ class Platform(pygame.sprite.Sprite):
                 self.game.plat_spritesheet.get_image(382, 0, 200, 100),
             ]
 
+        # load a random image
         self.image = random.choice(images)
 
         self.image.set_colorkey(s.BLACK)
@@ -114,7 +114,7 @@ class Platform(pygame.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
 
-        # spawn a vaccine on the platform
+        # spawn a powerup on the platform
         random_type = random.choice(['vaccine', 'ammo', 'health'])
         if random_type == 'vaccine':
             threshold = 90
@@ -123,6 +123,7 @@ class Platform(pygame.sprite.Sprite):
         elif random_type == 'health':
             threshold = 40
 
+        # only if value exceeds threshold
         if random.randrange(100) < threshold:
             PowerUp(self.game, self, type_=random_type)
 
@@ -203,21 +204,6 @@ class Player(pygame.sprite.Sprite):
         for frame in self.standing_frames_r:  # flip x, and not y
             self.standing_frames_l.append(pygame.transform.flip(frame, True, False))
 
-        # hurt frames
-        # self.hurt_frames_r = []
-        # hurt_dir = os.path.join(self.game.img_dir, s.PLAYER_HURT)
-        # for image in os.listdir(hurt_dir):
-        #     frame = pygame.image.load(os.path.join(hurt_dir, image)).convert()
-        #     rect = frame.get_rect()
-        #     frame = pygame.transform.scale(frame, (int(rect.width * 0.2),
-        #                                            int(rect.height * 0.2)))
-        #     frame.set_colorkey(s.BLACK)
-        #     self.hurt_frames_r.append(frame)
-
-        # self.hurt_frames_l = []
-        # for frame in self.hurt_frames_r:  # flip x, and not y
-        #     self.hurt_frames_l.append(pygame.transform.flip(frame, True, False))
-
         # jumping frames
         self.jumping_frames_r = []
         jump_dir = os.path.join(self.game.img_dir, s.PLAYER_JUMP)
@@ -247,21 +233,6 @@ class Player(pygame.sprite.Sprite):
         self.run_frames_l = []
         for frame in self.run_frames_r:  # flip x, and not y
             self.run_frames_l.append(pygame.transform.flip(frame, True, False))
-
-        # shooting frames
-        self.shooting_frames_r = []
-        shot_dir = os.path.join(self.game.img_dir, s.PLAYER_SHOT)
-        for image in os.listdir(shot_dir):
-            frame = pygame.image.load(os.path.join(shot_dir, image)).convert()
-            rect = frame.get_rect()
-            frame = pygame.transform.scale(frame, (int(rect.width * 0.2),
-                                                   int(rect.height * 0.2)))
-            frame.set_colorkey(s.BLACK)
-            self.shooting_frames_r.append(frame)
-
-        self.shooting_frames_l = []
-        for frame in self.shooting_frames_r:  # flip x, and not y
-            self.shooting_frames_l.append(pygame.transform.flip(frame, True, False))
 
     def jump(self):
         """Jumps the player.
