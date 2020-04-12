@@ -22,6 +22,7 @@ class CoronaBreakout:
         self.font_name = pygame.font.match_font(s.FONT_NAME)
         self.paused = False
         self.running = True
+        self.score = 0
         self.load_data()
 
     def load_data(self):
@@ -99,7 +100,6 @@ class CoronaBreakout:
         """
 
         # keeping track of missions
-        self.score = 0
         self.vaccines_collected = 0
         self.enemies_killed = 0
         self.n_bullets = 20  # initial number of bullets for the player
