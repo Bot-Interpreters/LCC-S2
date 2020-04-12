@@ -168,7 +168,7 @@ class Player(pygame.sprite.Sprite):
         self.running = False
         self.jumping = False
         self.shooting = False
-        self.lives = 1
+        self.lives = 2
 
         # tracking for animation
         self.current_frame = 0
@@ -400,8 +400,6 @@ class Bullet(pygame.sprite.Sprite):
 
     def update(self):
 
-        # self.animate()
-
         # move bullet across screen
         self.rect.x += self.vel
 
@@ -611,6 +609,7 @@ class Virus(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         if boss:
             self.image = pygame.transform.scale(self.image, (self.rect.width * 2, self.rect.height * 2))
+        self.rect = self.image.get_rect()  # update rect if boss
         self.mask = pygame.mask.from_surface(self.image)
         self.rect.top = self.bat.rect.bottom
         self.rect.centerx = self.bat.rect.centerx

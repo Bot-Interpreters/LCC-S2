@@ -102,7 +102,7 @@ class CoronaBreakout:
         self.score = 0
         self.vaccines_collected = 0
         self.enemies_killed = 0
-        self.n_bullets = 10  # initial number of bullets for the player
+        self.n_bullets = 20  # initial number of bullets for the player
 
         self.failed = False
 
@@ -288,6 +288,15 @@ class CoronaBreakout:
                 self.show_failed_screen()
         except Exception:
             pass
+
+        # bullet - virus collision check
+        if self.level == 4:
+            print('checking for bullet virus hits')
+            bv_hits = pygame.sprite.groupcollide(self.bullets, self.viruses, True, True)
+            if bv_hits:
+                self.dead_sound.play()
+                print('Bullet virus hit')
+                self.score += 20
 
         # bullet - enemy collision check
         be_hits = pygame.sprite.groupcollide(self.enemies, self.bullets, True, True)
@@ -502,7 +511,7 @@ class CoronaBreakout:
         """
 
         self.screen.blit(self.pause_image, (0, 0))
-        self.draw_text(str(self.score), 33, s.WHITE, s.WIDTH * 0.63, s.HEIGHT * 0.395)
+        self.draw_text(f'Score: {self.score}', 33, s.WHITE, s.WIDTH * 0.5, s.HEIGHT * 0.395)
 
         pygame.display.update()
         # if escape key is pressed, game resumes
