@@ -233,6 +233,10 @@ class CoronaBreakout:
 
         now = pygame.time.get_ticks()
 
+        # prevent the player from going towards the left
+        if self.player.rect.left <= 0:
+            self.player.rect.right = self.player.rect.width + 10
+
         # spawn Slime at level 1, 2, and 3 every 5 secs.
         if now - self.slime_timer > 5000 + random.choice([-1000, -500, 0, 500, 1000]):
             if not self.paused:
