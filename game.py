@@ -173,6 +173,7 @@ class CoronaBreakout:
             self.draw()
 
         # fadeout music
+        pygame.mixer.music.fadeout(500)
 
     def events(self):
         """Handling events.
