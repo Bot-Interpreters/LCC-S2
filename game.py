@@ -291,11 +291,9 @@ class CoronaBreakout:
 
         # bullet - virus collision check
         if self.level == 4:
-            print('checking for bullet virus hits')
             bv_hits = pygame.sprite.groupcollide(self.bullets, self.viruses, True, True)
             if bv_hits:
                 self.dead_sound.play()
-                print('Bullet virus hit')
                 self.score += 20
 
         # bullet - enemy collision check

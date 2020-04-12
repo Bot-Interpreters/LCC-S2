@@ -91,19 +91,33 @@ class Platform(pygame.sprite.Sprite):
 
         self.game = game
 
-        if self.game.level == 1:
+        if self.game.level == 1:  # stone platforms
             images = [
                 self.game.plat_spritesheet.get_image(0, 96, 380, 94),
                 self.game.plat_spritesheet.get_image(0, 192, 380, 94),
                 self.game.plat_spritesheet.get_image(382, 408, 200, 100),
                 self.game.plat_spritesheet.get_image(232, 1288, 200, 100),
             ]
-        else:
+        elif self.game.level == 2:  # rock platforms
             images = [
                 self.game.plat_spritesheet.get_image(0, 960, 380, 94),
                 self.game.plat_spritesheet.get_image(0, 864, 380, 94),
                 self.game.plat_spritesheet.get_image(218, 1558, 200, 100),
                 self.game.plat_spritesheet.get_image(382, 0, 200, 100),
+            ]
+        elif self.game.level == 3:  # grass platforms
+            images = [
+                self.game.plat_spritesheet.get_image(0, 288, 380, 94),
+                self.game.plat_spritesheet.get_image(0, 384, 380, 94),
+                self.game.plat_spritesheet.get_image(213, 1662, 201, 100),
+                self.game.plat_spritesheet.get_image(382, 204, 200, 100),
+            ]
+        else:  # snow platforms
+            images = [
+                self.game.plat_spritesheet.get_image(0, 768, 380, 94),
+                self.game.plat_spritesheet.get_image(0, 480, 380, 94),
+                self.game.plat_spritesheet.get_image(213, 1764, 201, 100),
+                self.game.plat_spritesheet.get_image(384, 306, 200, 100),
             ]
 
         # load a random image
