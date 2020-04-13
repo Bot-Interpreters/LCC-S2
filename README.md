@@ -24,6 +24,8 @@
 * Mr. Anand Jeyasingh, Yuva Bharathi Public School
 
 ## Installation
+**Binaries have been released.** Click [here](https://github.com/Bot-Interpreters/LCC-S2/releases/tag/v1.0 "Go to releases") to go to the releases page.
+
 **NOTE:** PyGame is the only third party module needed to run the game.
 * Clone the repo
 
