@@ -11,17 +11,17 @@ cx_Freeze.setup(name='Corona Breakout',
                     'build_exe': {
                         'packages': ['pygame'],
                         'include_files': [
-                                    'Comic Strips',
-                                    'images',
-                                    'sounds',
-                                    'game.py',
-                                    'settings.py',
-                                    'sprites.py'
+                            'Comic Strips',
+                            'images',
+                            'sounds',
+                            'game.py',
+                            'settings.py',
+                            'sprites.py'
                         ]
                     }
                 },
                 executables=executables,
                 description={
-                        'author': "Gautam J, Lokesh Kumar Bhansali, Sai Sidharth Sriram",
-                        'disc': 'Platformer game based on COVID19'
+                    'author': "Gautam J, Lokesh Kumar Bhansali, Sai Sidharth Sriram",
+                    'disc': 'Platformer game based on COVID19'
                 })
